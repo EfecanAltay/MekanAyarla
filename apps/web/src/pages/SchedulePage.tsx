@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Ban, Lock, Unlock } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { fetchApi } from '../lib/api';
+import { generateDays, generateSlots } from '../lib/slotutils';
 
 export default function SchedulePage() {
   const { t } = useTranslation();
@@ -41,7 +42,7 @@ export default function SchedulePage() {
       const res = await fetchApi(`/resources/${selectedResource}`);
       setResourceDetails(res.resource);
 
-      // Auto boundary and work-day calculation
+      // Auto boundary calculation
       const offDays = res.resource.offDays || [];
       let targetDate = new Date();
       if (res.resource?.startDate && new Date(res.resource.startDate) > targetDate) {
@@ -73,11 +74,10 @@ export default function SchedulePage() {
           .filter(s => selectedSlotIds.includes(s.id))
           .map(s => {
             const isVirtual = s.id.startsWith('virtual-');
-            const [_, start, end] = isVirtual ? s.id.split('|') : [null, null, null];
             return {
               id: isVirtual ? 'virtual' : s.id,
-              startTime: isVirtual ? start : s.startTime,
-              endTime: isVirtual ? end : s.endTime
+              startTime: s.startTime,
+              endTime: s.endTime
             };
           });
 
@@ -130,97 +130,10 @@ export default function SchedulePage() {
     );
   };
 
-  // Generate days based on resource startDate and endDate, or fallback to today -> 7 days
-  const days = useMemo(() => {
-    if (!resourceDetails) return [];
-
-    let start = new Date();
-    let end = new Date();
-    end.setDate(end.getDate() + 7);
-
-    if (resourceDetails.startDate && resourceDetails.endDate) {
-      start = new Date(resourceDetails.startDate);
-      end = new Date(resourceDetails.endDate);
-    }
-
-    const arr = [];
-    let curr = new Date(start);
-    // strip time
-    curr.setHours(0, 0, 0, 0);
-    const last = new Date(end);
-    last.setHours(0, 0, 0, 0);
-
-    const offDays = resourceDetails.offDays || [];
-
-    while (curr <= last) {
-      if (!offDays.includes(curr.getDay())) {
-        arr.push(new Date(curr));
-      }
-      curr.setDate(curr.getDate() + 1);
-    }
-
-    return arr;
-  }, [resourceDetails]);
-
+  const days = useMemo(() => generateDays(resourceDetails, 7), [resourceDetails]);
   const dayNames = ['Paz', 'Pzt', 'Sal', 'Çar', 'Per', 'Cum', 'Cmt'];
 
-  // Local slots filtered for active date - MERGING virtual and real slots
-  const slotsForActiveDate = useMemo(() => {
-    if (!resourceDetails) return [];
-
-    const slotDuration = resourceDetails.slotDuration || 60;
-    const [startH, startM] = (resourceDetails.startTime || "09:00").split(':').map(Number);
-    const [endH, endM] = (resourceDetails.endTime || "18:00").split(':').map(Number);
-
-    // 1. Generate Virtual Slots for the active date
-    const virtualSlots = [];
-    let currentSlotTime = new Date(activeDate);
-    currentSlotTime.setHours(startH, startM, 0, 0);
-
-    const endDayTime = new Date(activeDate);
-    endDayTime.setHours(endH, endM, 0, 0);
-
-    const offHours = resourceDetails.offHours || [];
-
-    while (currentSlotTime < endDayTime) {
-      const nextSlotTime = new Date(currentSlotTime.getTime() + slotDuration * 60000);
-      if (nextSlotTime > endDayTime) break;
-
-      const timeStr = currentSlotTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      const isDefaultOff = offHours.includes(timeStr);
-
-      virtualSlots.push({
-        id: `virtual-|${currentSlotTime.toISOString()}|${nextSlotTime.toISOString()}`,
-        startTime: new Date(currentSlotTime),
-        endTime: new Date(nextSlotTime),
-        isAvailable: !isDefaultOff,
-        capacity: resourceDetails.capacity,
-        _count: { reservations: 0 }
-      });
-
-      currentSlotTime = nextSlotTime;
-    }
-
-    // 2. Merge with actual database slots (exceptions)
-    if (!resourceDetails.slots) return virtualSlots;
-
-    return virtualSlots.map(vSlot => {
-      const actualSlot = resourceDetails.slots.find((s: any) =>
-        new Date(s.startTime).getTime() === vSlot.startTime.getTime()
-      );
-
-      if (actualSlot) {
-        return {
-          ...vSlot,
-          ...actualSlot,
-          // Ensure startTime/endTime objects are preserved if backend sends strings
-          startTime: new Date(actualSlot.startTime),
-          endTime: new Date(actualSlot.endTime)
-        };
-      }
-      return vSlot;
-    });
-  }, [resourceDetails, activeDate]);
+  const slotsForActiveDate = useMemo(() => generateSlots(resourceDetails, activeDate), [resourceDetails, activeDate]);
 
   const isWholeDateClosed = slotsForActiveDate.length > 0 && slotsForActiveDate.every((s: any) => !s.isAvailable);
 

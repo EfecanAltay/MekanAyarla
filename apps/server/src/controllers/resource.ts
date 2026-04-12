@@ -134,12 +134,19 @@ export const updateSlotStatus = async (req: AuthRequest, res: Response) => {
     const { isAvailable, note, startTime, endTime } = ToggleSlotSchema.parse(req.body);
 
     let slot;
+    const isCustomer = (req as any).user?.role === 'CUSTOMER';
+
     if (slotId && slotId.length === 36 && slotId !== 'virtual') {
+      if (isCustomer) throw new Error('Unauthorized to modify existing slots');
       slot = await prisma.timeSlot.update({
         where: { id: slotId },
         data: { isAvailable, note }
       });
     } else {
+      // For virtual slots, customers can ONLY materialize them as 'available'
+      const finalIsAvailable = isCustomer ? true : isAvailable;
+      const finalNote = isCustomer ? undefined : note;
+
       if (!startTime || !endTime) throw new Error("Missing times for virtual slot");
 
       const existing = await prisma.timeSlot.findFirst({
@@ -149,7 +156,7 @@ export const updateSlotStatus = async (req: AuthRequest, res: Response) => {
       if (existing) {
         slot = await prisma.timeSlot.update({
           where: { id: existing.id },
-          data: { isAvailable, note }
+          data: { isAvailable: finalIsAvailable, note: finalNote }
         });
       } else {
         const resource = await prisma.resource.findUnique({ where: { id: resourceId } });
@@ -159,8 +166,8 @@ export const updateSlotStatus = async (req: AuthRequest, res: Response) => {
             startTime: new Date(startTime),
             endTime: new Date(endTime),
             capacity: resource?.capacity || 1,
-            isAvailable,
-            note
+            isAvailable: finalIsAvailable,
+            note: finalNote
           }
         });
       }

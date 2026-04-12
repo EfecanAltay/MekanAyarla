@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchApi } from '../lib/api';
 import { Search, MapPin, ArrowRight, Check } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { generateDays, generateSlots } from '../lib/slotutils';
 
 export default function BrowsePage() {
   const { t } = useTranslation();
@@ -28,7 +29,7 @@ export default function BrowsePage() {
     : resources.filter(r => r.type?.name?.toLowerCase().includes(activeFilter));
 
   if (bookingResource) {
-    return <BookingFlow resource={bookingResource} onBack={() => setBookingResource(null)} />;
+    return <BookingFlow resourceId={bookingResource.id} onBack={() => setBookingResource(null)} />;
   }
 
   return (
@@ -111,56 +112,85 @@ export default function BrowsePage() {
 }
 
 // Booking Flow Sub-Component
-function BookingFlow({ resource, onBack }: { resource: any; onBack: () => void }) {
+function BookingFlow({ resourceId, onBack }: { resourceId: string; onBack: () => void }) {
   const { t } = useTranslation();
+  const [resourceDetails, setResourceDetails] = useState<any>(null);
   const [step, setStep] = useState(1);
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [selectedSlot, setSelectedSlot] = useState<any | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [bookingNotes, setBookingNotes] = useState('');
 
-  // Generate 14 days
-  const days = Array.from({ length: 14 }, (_, i) => {
-    const d = new Date(); d.setDate(d.getDate() + i); return d;
-  });
+  useEffect(() => {
+    fetchApi(`/resources/${resourceId}`).then(res => {
+      setResourceDetails(res.resource);
+
+      // Attempt to set first available date
+      const availableDays = generateDays(res.resource);
+      if (availableDays.length > 0) {
+        setSelectedDate(availableDays[0]);
+      }
+    });
+  }, [resourceId]);
+
+  const days = useMemo(() => generateDays(resourceDetails), [resourceDetails]);
+  const slots = useMemo(() => generateSlots(resourceDetails, selectedDate), [resourceDetails, selectedDate]);
+
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
-  // Mock slots for DEMO inside Browse, since we don't have a reliable slots generation API hooked up to customer side.
-  const mockSlots = [
-    { id: 1, time: '10:00–11:00', capacity: 2, booked: 0, status: 'open' },
-    { id: 2, time: '13:00–14:00', capacity: 2, booked: 0, status: 'open' },
-    { id: 3, time: '15:00–16:00', capacity: 2, booked: 2, status: 'full' },
-  ];
-
   const handleConfirm = async () => {
+    if (!selectedSlot || !resourceDetails) return;
+
     setIsSubmitting(true);
     try {
-      // For now, post the reservation using a mocked startTime/endTime for demo purposes since we don't strictly bind TimeSlots here
-      // Ideally we would trigger POST /api/reservations passing timeSlotId.
+      let finalSlotId = selectedSlot.id;
+
+      // 1. Check if virtual and materialize
+      if (finalSlotId.startsWith('virtual-')) {
+        const res = await fetchApi(`/resources/${resourceId}/slots/virtual/toggle`, {
+          method: 'PATCH',
+          body: JSON.stringify({
+            isAvailable: true,
+            startTime: selectedSlot.startTime,
+            endTime: selectedSlot.endTime
+          })
+        });
+        finalSlotId = res.slot.id;
+      }
+
+      // 2. Create reservation
       await fetchApi('/reservations', {
         method: 'POST',
-        // Note: The backend expects real timeSlotId. Since the backend lacks proper timeSlot seeding, 
-        // to prevent 500 error we just simulate success or alert.
         body: JSON.stringify({
-          timeSlotId: "mock-id-which-will-fail", // The real implementation requires actual seeded slot IDs
+          timeSlotId: finalSlotId,
+          notes: bookingNotes
         })
       });
+
       alert('Reserved successfully!');
       onBack();
     } catch (err: any) {
-      alert("Note for Demo: Backend lacks seeded TimeSlots. Booking logic front-end complete.");
-      onBack();
+      alert(err.message || "Booking failed");
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  if (!resourceDetails) {
+    return (
+      <div className="flex h-screen w-full items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+      </div>
+    );
+  }
+
   return (
     <div className="fade-in max-w-2xl mx-auto p-4 md:p-6 pb-20">
       <div className="flex items-start justify-between gap-4 mb-6 border-b border-border pb-5">
         <div>
-          <h1 className="font-display text-2xl font-bold tracking-tight mb-1">Book {resource.name}</h1>
+          <h1 className="font-display text-2xl font-bold tracking-tight mb-1">Book {resourceDetails.name}</h1>
           <p className="text-sm text-muted-foreground flex items-center gap-2">
-            <span>{resource.type?.name}</span> • <span>{resource.branch?.name}</span>
+            <span>{resourceDetails.type?.name}</span> • <span>{resourceDetails.branch?.name}</span>
           </p>
         </div>
         <Button variant="ghost" size="sm" onClick={onBack} className="text-muted-foreground">← {t('booking.back')}</Button>
@@ -196,7 +226,7 @@ function BookingFlow({ resource, onBack }: { resource: any; onBack: () => void }
           <div className="flex gap-2 overflow-x-auto pb-4 mb-2 scrollbar-none snap-x">
             {days.map((d, i) => {
               const isSelected = selectedDate.toDateString() === d.toDateString();
-              const isToday = i === 0;
+              const isToday = d.toDateString() === new Date().toDateString();
               return (
                 <div
                   key={i}
@@ -232,28 +262,35 @@ function BookingFlow({ resource, onBack }: { resource: any; onBack: () => void }
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {mockSlots.map(s => (
-              <div
-                key={s.id}
-                className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border text-center transition-all ${s.status === 'full'
-                  ? 'bg-secondary/30 border-border opacity-50 cursor-not-allowed'
-                  : selectedSlot?.id === s.id
-                    ? 'bg-primary/20 border-primary shadow-[0_0_0_2px_rgba(108,99,255,0.2)]'
-                    : 'bg-secondary/50 border-border hover:border-primary hover:bg-primary/5 cursor-pointer'
-                  }`}
-                onClick={() => s.status !== 'full' && setSelectedSlot(s)}
-              >
-                <div className="font-display font-bold text-base">{s.time.split('–')[0]}</div>
-                <div className="text-xs text-muted-foreground mt-[-4px]">–{s.time.split('–')[1]}</div>
-                <div className={`px-2.5 py-0.5 mt-1.5 rounded-full text-[0.65rem] font-bold tracking-widest uppercase ${s.status === 'full' ? 'bg-destructive/15 text-destructive' : 'bg-success/15 text-success'
-                  }`}>
-                  {s.status}
+            {slots.map(s => {
+              const isFull = (s._count?.reservations || 0) >= (s.capacity || resourceDetails.capacity);
+              const isAvailable = s.isAvailable && !isFull;
+              const startTimeStr = new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+              const endTimeStr = new Date(s.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+              return (
+                <div
+                  key={s.id}
+                  className={`flex flex-col items-center gap-1.5 p-4 rounded-xl border text-center transition-all ${!isAvailable
+                    ? 'bg-secondary/30 border-border opacity-50 cursor-not-allowed'
+                    : selectedSlot?.id === s.id
+                      ? 'bg-primary/20 border-primary shadow-[0_0_0_2px_rgba(108,99,255,0.2)]'
+                      : 'bg-secondary/50 border-border hover:border-primary hover:bg-primary/5 cursor-pointer'
+                    }`}
+                  onClick={() => isAvailable && setSelectedSlot(s)}
+                >
+                  <div className="font-display font-bold text-base">{startTimeStr}</div>
+                  <div className="text-xs text-muted-foreground mt-[-4px]">-{endTimeStr}</div>
+                  <div className={`px-2.5 py-0.5 mt-1.5 rounded-full text-[0.65rem] font-bold tracking-widest uppercase ${!isAvailable ? 'bg-destructive/15 text-destructive' : 'bg-success/15 text-success'
+                    }`}>
+                    {!s.isAvailable ? 'Closed' : (isFull ? 'Full' : 'Open')}
+                  </div>
+                  <div className={`text-[0.7rem] font-medium mt-1 ${!isAvailable ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    {isFull ? 'Full' : `${(s.capacity || resourceDetails.capacity) - (s._count?.reservations || 0)} left`}
+                  </div>
                 </div>
-                <div className={`text-[0.7rem] font-medium mt-1 ${s.status === 'full' ? 'text-destructive' : 'text-muted-foreground'}`}>
-                  {s.status === 'full' ? 'Full' : `${s.capacity - s.booked} left`}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           <div className="mt-6 pt-5 border-t border-border flex justify-between items-center">
@@ -281,7 +318,7 @@ function BookingFlow({ resource, onBack }: { resource: any; onBack: () => void }
             <div className="text-[0.65rem] font-bold tracking-widest uppercase text-muted-foreground mb-3">{t('booking.summary')}</div>
             <div className="flex justify-between py-2.5 border-b border-border/50">
               <span className="text-[0.9rem] text-muted-foreground">Resource</span>
-              <span className="text-[0.9rem] font-semibold">{resource.name}</span>
+              <span className="text-[0.9rem] font-semibold">{resourceDetails.name}</span>
             </div>
             <div className="flex justify-between py-2.5 border-b border-border/50">
               <span className="text-[0.9rem] text-muted-foreground">Date</span>
@@ -289,11 +326,13 @@ function BookingFlow({ resource, onBack }: { resource: any; onBack: () => void }
             </div>
             <div className="flex justify-between py-2.5 border-b border-border/50">
               <span className="text-[0.9rem] text-muted-foreground">Time</span>
-              <span className="text-[0.9rem] font-semibold">{selectedSlot?.time}</span>
+              <span className="text-[0.9rem] font-semibold">
+                {new Date(selectedSlot?.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+              </span>
             </div>
             <div className="flex justify-between py-2.5">
               <span className="text-[0.9rem] text-muted-foreground">Location</span>
-              <span className="text-[0.9rem] font-semibold">{resource.branch?.name}</span>
+              <span className="text-[0.9rem] font-semibold">{resourceDetails.branch?.name}</span>
             </div>
           </div>
 
@@ -302,6 +341,8 @@ function BookingFlow({ resource, onBack }: { resource: any; onBack: () => void }
             <textarea
               className="resize-y min-h-[80px] bg-secondary/50 border border-border rounded-xl p-3 text-[0.9rem] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
               placeholder={t('booking.ph_notes')}
+              value={bookingNotes}
+              onChange={(e) => setBookingNotes(e.target.value)}
             />
           </div>
 
