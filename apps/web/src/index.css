@@ -1,0 +1,90 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: 'DM Sans', sans-serif;
+  --font-display: 'Syne', sans-serif;
+
+  --color-background: #0a0a0f;
+  --color-foreground: #f0f0f8;
+  --color-muted: #252535;
+  --color-muted-foreground: #9090b0;
+
+  --color-card: #13131a;
+  --color-card-foreground: #f0f0f8;
+  --color-popover: #1c1c27;
+  --color-popover-foreground: #f0f0f8;
+
+  --color-primary: #6c63ff;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1c1c27;
+  --color-secondary-foreground: #f0f0f8;
+
+  --color-accent: #a78bfa;
+  --color-accent-foreground: #ffffff;
+
+  --color-destructive: #f87171;
+  --color-destructive-foreground: #ffffff;
+
+  --color-border: #2a2a3d;
+  --color-input: #363650;
+  --color-ring: #6c63ff;
+
+  --color-success: #34d399;
+  --color-warning: #fbbf24;
+  --color-accent3: #38bdf8;
+  --color-text3: #5a5a7a;
+
+  --radius-lg: 20px;
+  --radius-md: 12px;
+  --radius-sm: 8px;
+  --radius: 12px;
+
+  --animate-accordion-down: accordion-down 0.2s ease-out;
+  --animate-accordion-up: accordion-up 0.2s ease-out;
+
+  @keyframes accordion-down {
+    from {
+      height: 0;
+    }
+
+    to {
+      height: var(--radix-accordion-content-height);
+    }
+  }
+
+  @keyframes accordion-up {
+    from {
+      height: var(--radix-accordion-content-height);
+    }
+
+    to {
+      height: 0;
+    }
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased font-sans;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px)
+  }
+
+  to {
+    opacity: 1;
+    transform: none
+  }
+}
