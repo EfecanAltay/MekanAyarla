@@ -1,0 +1,3054 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boş Yer Var MI ? — Flexible Reservation Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
+    rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --surface: #13131a;
+      --surface2: #1c1c27;
+      --surface3: #252535;
+      --border: #2a2a3d;
+      --border2: #363650;
+      --accent: #6c63ff;
+      --accent2: #a78bfa;
+      --accent3: #38bdf8;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --text: #f0f0f8;
+      --text2: #9090b0;
+      --text3: #5a5a7a;
+      --radius: 12px;
+      --radius-sm: 8px;
+      --radius-lg: 20px;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-size: 16px;
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .font-display {
+      font-family: 'Syne', sans-serif;
+    }
+
+    /* ───── LAYOUT ───── */
+    .app {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .main-layout {
+      display: flex;
+      flex: 1;
+    }
+
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    /* ───── TOPBAR ───── */
+    .topbar {
+      height: 60px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(12px);
+    }
+
+    .topbar-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent3) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      flex-shrink: 0;
+    }
+
+    .topbar-logo span {
+      -webkit-text-fill-color: var(--text2);
+      font-weight: 400;
+      font-size: 0.8rem;
+      display: block;
+      letter-spacing: 0.05em;
+    }
+
+    .topbar-spacer {
+      flex: 1;
+    }
+
+    .topbar-nav {
+      display: flex;
+      gap: 4px;
+    }
+
+    .topbar-nav button {
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+    }
+
+    .topbar-nav button:hover {
+      color: var(--text);
+      background: var(--surface2);
+    }
+
+    .topbar-nav button.active {
+      color: var(--accent2);
+      background: rgba(108, 99, 255, 0.12);
+    }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      flex-shrink: 0;
+      font-family: 'Syne', sans-serif;
+    }
+
+    .mobile-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      padding: 6px;
+      border-radius: 8px;
+    }
+
+    /* ───── SIDEBAR ───── */
+    .sidebar {
+      width: 220px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      flex-shrink: 0;
+      overflow-y: auto;
+    }
+
+    .sidebar-section {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--text3);
+      padding: 10px 10px 4px;
+      margin-top: 4px;
+    }
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 12px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+      font-size: 0.875rem;
+      color: var(--text2);
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+
+    .sidebar-item:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .sidebar-item.active {
+      background: rgba(108, 99, 255, 0.15);
+      color: var(--accent2);
+      font-weight: 500;
+    }
+
+    .sidebar-item svg {
+      flex-shrink: 0;
+      opacity: 0.7;
+    }
+
+    .sidebar-item.active svg {
+      opacity: 1;
+    }
+
+    .sidebar-badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 20px;
+      min-width: 18px;
+      text-align: center;
+    }
+
+    /* ───── MOBILE DRAWER ───── */
+    .mobile-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      z-index: 200;
+      backdrop-filter: blur(4px);
+    }
+
+    .mobile-drawer {
+      display: none;
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 260px;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      z-index: 201;
+      padding: 20px 10px;
+      flex-direction: column;
+      gap: 4px;
+      overflow-y: auto;
+      transform: translateX(-100%);
+      transition: transform 0.3s ease;
+    }
+
+    .mobile-drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px 16px;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 8px;
+    }
+
+    /* ───── PAGE HEADER ───── */
+    .page-header {
+      padding: 28px 24px 20px;
+      border-bottom: 1px solid var(--border);
+      background: var(--surface);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .page-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .page-subtitle {
+      color: var(--text2);
+      font-size: 0.875rem;
+      margin-top: 4px;
+    }
+
+    /* ───── SECTIONS ───── */
+    .section {
+      padding: 24px;
+    }
+
+    .section-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 16px;
+      letter-spacing: -0.01em;
+    }
+
+    /* ───── CARDS ───── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+    }
+
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: var(--border2);
+    }
+
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+    }
+
+    .stat-card.purple::before {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+    }
+
+    .stat-card.blue::before {
+      background: linear-gradient(90deg, var(--accent3), #60a5fa);
+    }
+
+    .stat-card.green::before {
+      background: linear-gradient(90deg, var(--success), #6ee7b7);
+    }
+
+    .stat-card.amber::before {
+      background: linear-gradient(90deg, var(--warning), #fcd34d);
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .stat-value {
+      font-family: 'Syne', sans-serif;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1;
+    }
+
+    .stat-change {
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .stat-change.up {
+      color: var(--success);
+    }
+
+    .stat-change.down {
+      color: var(--danger);
+    }
+
+    /* ───── RESOURCE CARDS ───── */
+    .resource-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .resource-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(108, 99, 255, 0.15);
+    }
+
+    .resource-card-header {
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+    }
+
+    .resource-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+
+    .resource-icon.lesson {
+      background: rgba(108, 99, 255, 0.2);
+    }
+
+    .resource-icon.cafe {
+      background: rgba(251, 191, 36, 0.15);
+    }
+
+    .resource-icon.desk {
+      background: rgba(56, 189, 248, 0.15);
+    }
+
+    .resource-icon.room {
+      background: rgba(52, 211, 153, 0.15);
+    }
+
+    .resource-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .resource-type {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 2px 8px;
+      border-radius: 20px;
+      margin-top: 4px;
+      display: inline-block;
+    }
+
+    .resource-type.lesson {
+      background: rgba(108, 99, 255, 0.2);
+      color: var(--accent2);
+    }
+
+    .resource-type.cafe {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--warning);
+    }
+
+    .resource-type.desk {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent3);
+    }
+
+    .resource-type.room {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--success);
+    }
+
+    .resource-card-body {
+      padding: 0 20px 16px;
+      font-size: 0.85rem;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    .resource-card-footer {
+      padding: 12px 20px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+    }
+
+    .capacity-bar {
+      flex: 1;
+      margin: 0 12px;
+      height: 4px;
+      background: var(--surface3);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+
+    .capacity-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+    }
+
+    .capacity-fill.low {
+      background: var(--success);
+    }
+
+    .capacity-fill.mid {
+      background: var(--warning);
+    }
+
+    .capacity-fill.high {
+      background: var(--danger);
+    }
+
+    /* ───── SLOT GRID ───── */
+    .slot-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 10px;
+    }
+
+    .slot-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 14px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .slot-card:hover:not(.full):not(.closed) {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.08);
+    }
+
+    .slot-card.selected {
+      border-color: var(--accent);
+      background: rgba(108, 99, 255, 0.18);
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.2);
+    }
+
+    .slot-card.full {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .slot-card.closed {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .slot-time {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+    }
+
+    .slot-avail {
+      font-size: 0.7rem;
+      color: var(--text2);
+    }
+
+    .slot-avail.low {
+      color: var(--warning);
+    }
+
+    .slot-avail.full {
+      color: var(--danger);
+    }
+
+    .slot-status {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 2px 6px;
+      border-radius: 20px;
+    }
+
+    .slot-status.open {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--success);
+    }
+
+    .slot-status.full {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--danger);
+    }
+
+    .slot-status.waitlist {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--warning);
+    }
+
+    /* ───── TABLE ───── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    thead {
+      background: var(--surface2);
+    }
+
+    th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text3);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 14px 16px;
+      border-top: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .td-name {
+      font-weight: 500;
+    }
+
+    .td-sub {
+      font-size: 0.78rem;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    /* ───── BADGE ───── */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+      padding: 3px 9px;
+      border-radius: 20px;
+      white-space: nowrap;
+    }
+
+    .badge.confirmed {
+      background: rgba(52, 211, 153, 0.15);
+      color: var(--success);
+    }
+
+    .badge.pending {
+      background: rgba(251, 191, 36, 0.15);
+      color: var(--warning);
+    }
+
+    .badge.cancelled {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--danger);
+    }
+
+    .badge.waitlist {
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent3);
+    }
+
+    .badge.active {
+      background: rgba(52, 211, 153, 0.12);
+      color: var(--success);
+    }
+
+    .badge.inactive {
+      background: rgba(90, 90, 122, 0.2);
+      color: var(--text3);
+    }
+
+    /* ───── BUTTONS ───── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 18px;
+      border-radius: var(--radius-sm);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      border: none;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), #5b52e0);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(108, 99, 255, 0.3);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 20px rgba(108, 99, 255, 0.4);
+    }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--surface3);
+      border-color: var(--border2);
+    }
+
+    .btn-ghost {
+      background: none;
+      color: var(--text2);
+      padding: 9px 14px;
+    }
+
+    .btn-ghost:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    .btn-danger {
+      background: rgba(248, 113, 113, 0.15);
+      color: var(--danger);
+      border: 1px solid rgba(248, 113, 113, 0.2);
+    }
+
+    .btn-danger:hover {
+      background: rgba(248, 113, 113, 0.25);
+    }
+
+    .btn-sm {
+      padding: 6px 12px;
+      font-size: 0.8rem;
+    }
+
+    .btn-lg {
+      padding: 13px 28px;
+      font-size: 1rem;
+    }
+
+    /* ───── FORM ───── */
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      color: var(--text2);
+    }
+
+    .form-input,
+    .form-select,
+    .form-textarea {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 14px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      width: 100%;
+      transition: border-color 0.15s;
+      outline: none;
+    }
+
+    .form-input:focus,
+    .form-select:focus,
+    .form-textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15);
+    }
+
+    .form-input::placeholder {
+      color: var(--text3);
+    }
+
+    .form-select {
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-hint {
+      font-size: 0.75rem;
+      color: var(--text3);
+      margin-top: 2px;
+    }
+
+    .form-error {
+      font-size: 0.75rem;
+      color: var(--danger);
+      margin-top: 2px;
+    }
+
+    /* ───── TABS ───── */
+    .tabs {
+      display: flex;
+      gap: 2px;
+      background: var(--surface2);
+      padding: 4px;
+      border-radius: var(--radius-sm);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 8px 18px;
+      border-radius: 6px;
+      border: none;
+      background: none;
+      color: var(--text2);
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.875rem;
+      white-space: nowrap;
+      transition: all 0.15s;
+    }
+
+    .tab-btn.active {
+      background: var(--surface);
+      color: var(--text);
+      font-weight: 500;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+    }
+
+    .tab-btn:hover:not(.active) {
+      color: var(--text);
+    }
+
+    /* ───── CALENDAR STRIP ───── */
+    .cal-strip {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .cal-day {
+      flex-shrink: 0;
+      width: 52px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      padding: 10px 6px;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      transition: all 0.15s;
+      border: 1px solid var(--border);
+      background: var(--surface2);
+    }
+
+    .cal-day:hover {
+      border-color: var(--border2);
+      background: var(--surface3);
+    }
+
+    .cal-day.selected {
+      background: var(--accent);
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(108, 99, 255, 0.4);
+    }
+
+    .cal-day.today:not(.selected) {
+      border-color: var(--accent2);
+    }
+
+    .cal-dow {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      opacity: 0.7;
+    }
+
+    .cal-date {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .cal-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .cal-day.selected .cal-dot {
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    /* ───── BOOKING FLOW ───── */
+    .booking-flow {
+      max-width: 580px;
+      margin: 0 auto;
+    }
+
+    .booking-step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+
+    .step-num {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 0.875rem;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+    }
+
+    .step-complete .step-num {
+      background: var(--success);
+    }
+
+    /* ───── MODAL ───── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.75);
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 28px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: modalIn 0.2s ease;
+    }
+
+    @keyframes modalIn {
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(10px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .modal-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.15rem;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text2);
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+    }
+
+    .close-btn:hover {
+      background: var(--surface2);
+      color: var(--text);
+    }
+
+    /* ───── TOAST ───── */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 400;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.875rem;
+      min-width: 260px;
+      max-width: 360px;
+      animation: toastIn 0.3s ease;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateY(12px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .toast.success .toast-icon {
+      color: var(--success);
+    }
+
+    .toast.error .toast-icon {
+      color: var(--danger);
+    }
+
+    .toast.info .toast-icon {
+      color: var(--accent2);
+    }
+
+    /* ───── EMPTY STATE ───── */
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: var(--text2);
+    }
+
+    .empty-icon {
+      font-size: 3rem;
+      margin-bottom: 12px;
+      opacity: 0.3;
+    }
+
+    .empty-title {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+
+    .empty-desc {
+      font-size: 0.875rem;
+      line-height: 1.6;
+    }
+
+    /* ───── PROGRESS STEPPER ───── */
+    .stepper {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin-bottom: 24px;
+    }
+
+    .step-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex: 1;
+    }
+
+    .step-circle {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      border: 2px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text3);
+      transition: all 0.3s;
+      background: var(--surface);
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-item.active .step-circle {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: rgba(108, 99, 255, 0.1);
+    }
+
+    .step-item.done .step-circle {
+      background: var(--success);
+      border-color: var(--success);
+      color: #fff;
+    }
+
+    .step-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      margin-top: 4px;
+      color: var(--text3);
+    }
+
+    .step-item.active .step-label {
+      color: var(--accent2);
+    }
+
+    .step-item.done .step-label {
+      color: var(--success);
+    }
+
+    .step-line {
+      flex: 1;
+      height: 2px;
+      background: var(--border2);
+      margin-top: -14px;
+    }
+
+    .step-line.done {
+      background: var(--success);
+    }
+
+    /* ───── CHART PLACEHOLDER ───── */
+    .chart-area {
+      height: 160px;
+      background: var(--surface2);
+      border-radius: var(--radius-sm);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: flex-end;
+      padding: 16px;
+      gap: 8px;
+    }
+
+    .chart-bar {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, var(--accent), rgba(108, 99, 255, 0.3));
+      transition: height 0.5s ease;
+      min-width: 0;
+    }
+
+    /* ───── POLICY RULE ───── */
+    .rule-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .rule-row:last-child {
+      border-bottom: none;
+    }
+
+    .rule-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+    }
+
+    .rule-desc {
+      font-size: 0.78rem;
+      color: var(--text2);
+      margin-top: 2px;
+    }
+
+    .toggle {
+      width: 40px;
+      height: 22px;
+      background: var(--surface3);
+      border-radius: 11px;
+      cursor: pointer;
+      position: relative;
+      transition: background 0.2s;
+      flex-shrink: 0;
+    }
+
+    .toggle::after {
+      content: '';
+      position: absolute;
+      left: 3px;
+      top: 3px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+
+    .toggle.on {
+      background: var(--accent);
+    }
+
+    .toggle.on::after {
+      transform: translateX(18px);
+    }
+
+    /* ───── MOBILE NAV ───── */
+    .mobile-bottom-nav {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 8px 0 max(8px, env(safe-area-inset-bottom));
+      z-index: 100;
+    }
+
+    .mobile-nav-items {
+      display: flex;
+      justify-content: space-around;
+    }
+
+    .mobile-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      padding: 6px 16px;
+      cursor: pointer;
+      border: none;
+      background: none;
+      color: var(--text3);
+      font-family: 'DM Sans', sans-serif;
+      transition: color 0.15s;
+    }
+
+    .mobile-nav-item.active {
+      color: var(--accent2);
+    }
+
+    .mobile-nav-item span {
+      font-size: 0.65rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+
+    /* ───── UTILS ───── */
+    .flex {
+      display: flex;
+    }
+
+    .flex-col {
+      flex-direction: column;
+    }
+
+    .items-center {
+      align-items: center;
+    }
+
+    .justify-between {
+      justify-content: space-between;
+    }
+
+    .gap-2 {
+      gap: 8px;
+    }
+
+    .gap-3 {
+      gap: 12px;
+    }
+
+    .gap-4 {
+      gap: 16px;
+    }
+
+    .mt-1 {
+      margin-top: 4px;
+    }
+
+    .mt-2 {
+      margin-top: 8px;
+    }
+
+    .mt-3 {
+      margin-top: 12px;
+    }
+
+    .mt-4 {
+      margin-top: 16px;
+    }
+
+    .mb-3 {
+      margin-bottom: 12px;
+    }
+
+    .mb-4 {
+      margin-bottom: 16px;
+    }
+
+    .text-sm {
+      font-size: 0.85rem;
+    }
+
+    .text-xs {
+      font-size: 0.75rem;
+    }
+
+    .text-muted {
+      color: var(--text2);
+    }
+
+    .text-muted2 {
+      color: var(--text3);
+    }
+
+    .font-bold {
+      font-weight: 700;
+    }
+
+    .font-syne {
+      font-family: 'Syne', sans-serif;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .w-full {
+      width: 100%;
+    }
+
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: 20px 0;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      background: var(--surface3);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 0.75rem;
+      color: var(--text2);
+    }
+
+    .dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .dot.green {
+      background: var(--success);
+    }
+
+    .dot.amber {
+      background: var(--warning);
+    }
+
+    .dot.red {
+      background: var(--danger);
+    }
+
+    .dot.blue {
+      background: var(--accent3);
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--surface2) 25%, var(--surface3) 50%, var(--surface2) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.5s infinite;
+      border-radius: 6px;
+    }
+
+    @keyframes shimmer {
+      to {
+        background-position: -200% 0
+      }
+    }
+
+    .glass {
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* ───── RESPONSIVE ───── */
+    @media(max-width:768px) {
+      .sidebar {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: flex !important;
+      }
+
+      .mobile-overlay {
+        display: block;
+      }
+
+      .mobile-drawer {
+        display: flex;
+      }
+
+      .mobile-bottom-nav {
+        display: block;
+      }
+
+      .topbar-nav {
+        display: none;
+      }
+
+      .content-area {
+        padding-bottom: 70px;
+      }
+
+      .page-header {
+        padding: 20px 16px 16px;
+      }
+
+      .section {
+        padding: 16px;
+      }
+
+      .card-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .stat-value {
+        font-size: 1.6rem;
+      }
+
+      .slot-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      }
+
+      .table-wrap table {
+        display: block;
+      }
+
+      .table-wrap thead {
+        display: none;
+      }
+
+      .table-wrap tbody {
+        display: block;
+      }
+
+      .table-wrap tr {
+        display: block;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-sm);
+        padding: 14px;
+        margin-bottom: 10px;
+      }
+
+      .table-wrap td {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 6px 0;
+        border: none;
+        font-size: 0.82rem;
+      }
+
+      .table-wrap td::before {
+        content: attr(data-label);
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        color: var(--text3);
+        min-width: 90px;
+      }
+
+      .modal {
+        max-width: 100%;
+        margin: auto;
+        border-radius: var(--radius) var(--radius) 0 0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        max-height: 90vh;
+      }
+
+      .modal-overlay {
+        align-items: flex-end;
+        padding: 0;
+      }
+
+      .toast-container {
+        left: 16px;
+        right: 16px;
+        bottom: 80px;
+      }
+
+      .toast {
+        min-width: 0;
+      }
+    }
+
+    @media(max-width:480px) {
+      .topbar {
+        padding: 0 12px;
+      }
+
+      .page-title {
+        font-size: 1.2rem;
+      }
+    }
+
+    /* ───── ANIMATIONS ───── */
+    .fade-in {
+      animation: fadeIn 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px)
+      }
+
+      to {
+        opacity: 1;
+        transform: none
+      }
+    }
+
+    .pulse {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1
+      }
+
+      50% {
+        opacity: 0.6
+      }
+    }
+
+    /* ───── LANDING ───── */
+    .landing {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .hero {
+      padding: 80px 24px 60px;
+      text-align: center;
+      background: radial-gradient(ellipse at top, rgba(108, 99, 255, 0.15) 0%, transparent 70%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%236c63ff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(108, 99, 255, 0.12);
+      border: 1px solid rgba(108, 99, 255, 0.3);
+      border-radius: 20px;
+      padding: 6px 16px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 6vw, 3.5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .hero-title span {
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-sub {
+      font-size: 1.1rem;
+      color: var(--text2);
+      max-width: 520px;
+      margin: 0 auto 36px;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .feature-pills {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 40px;
+    }
+
+    .feature-pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--text2);
+    }
+
+    .use-cases {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      padding: 40px 24px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .use-case {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px;
+      text-align: center;
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .use-case:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+
+    .use-case-icon {
+      font-size: 2.5rem;
+      margin-bottom: 12px;
+    }
+
+    .use-case-name {
+      font-family: 'Syne', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      margin-bottom: 6px;
+    }
+
+    .use-case-desc {
+      font-size: 0.82rem;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+
+    /* ───── AUTH ───── */
+    .auth-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: radial-gradient(ellipse at center, rgba(108, 99, 255, 0.1) 0%, transparent 70%);
+    }
+
+    .auth-card {
+      width: 100%;
+      max-width: 400px;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-logo {
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      font-size: 1.8rem;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, var(--accent), var(--accent3));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    /* ───── NOTIFICATIONS ───── */
+    .notif-item {
+      display: flex;
+      gap: 12px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      transition: background 0.1s;
+    }
+
+    .notif-item:hover {
+      background: rgba(255, 255, 255, 0.01);
+    }
+
+    .notif-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent);
+      margin-top: 5px;
+      flex-shrink: 0;
+    }
+
+    .notif-dot.read {
+      background: var(--text3);
+    }
+  </style>
+</head>
+
+<body>
+  <div id="app"></div>
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // ═══════════════════════════════════════════════
+    // RESERVELY — Full Platform Demo
+    // ═══════════════════════════════════════════════
+
+    // ─── DATA STORE ───────────────────────────────
+    const store = {
+      currentView: 'landing',
+      isAdmin: false,
+      user: null,
+      mobileDrawerOpen: false,
+      selectedDate: new Date(),
+      selectedSlot: null,
+      bookingStep: 1,
+      showModal: null,
+      reservations: [
+        { id: 1, resource: 'Python Basics', type: 'lesson', slot: '18:00–19:00', date: 'Mon Apr 14', status: 'confirmed', attendee: 'Ayşe Kaya', seats: 1 },
+        { id: 2, resource: 'Table #4', type: 'cafe', slot: '13:00–15:00', date: 'Tue Apr 15', status: 'confirmed', attendee: 'Mehmet Demir', seats: 2 },
+        { id: 3, resource: 'Focus Desk B7', type: 'desk', slot: '09:00–17:00', date: 'Wed Apr 16', status: 'pending', attendee: 'Sara Öztürk', seats: 1 },
+        { id: 4, resource: 'Meeting Room A', type: 'room', slot: '14:00–16:00', date: 'Thu Apr 17', status: 'waitlist', attendee: 'Ali Yıldız', seats: 4 },
+        { id: 5, resource: 'Python Basics', type: 'lesson', slot: '18:00–19:00', date: 'Mon Apr 14', status: 'cancelled', attendee: 'Fatma Çelik', seats: 1 },
+        { id: 6, resource: 'Table #2', type: 'cafe', slot: '19:00–21:00', date: 'Fri Apr 18', status: 'confirmed', attendee: 'Can Arslan', seats: 3 },
+      ],
+      resources: [
+        { id: 1, name: 'Python Basics', type: 'lesson', capacity: 6, booked: 4, desc: 'Beginner-friendly intro to Python programming. Hands-on projects.', branch: 'Main Campus', active: true },
+        { id: 2, name: 'JavaScript Advanced', type: 'lesson', capacity: 4, booked: 4, desc: 'Deep-dive into JS: closures, async/await, design patterns.', branch: 'Main Campus', active: true },
+        { id: 3, name: 'Table #4', type: 'cafe', capacity: 4, booked: 2, desc: 'Window table for 4, cozy corner with natural light.', branch: 'Garden Café', active: true },
+        { id: 4, name: 'Table #7', type: 'cafe', capacity: 2, booked: 0, desc: 'Intimate table for 2, perfect for meetings.', branch: 'Garden Café', active: true },
+        { id: 5, name: 'Focus Desk B7', type: 'desk', capacity: 1, booked: 1, desc: 'Quiet zone desk with dual monitor setup and fast WiFi.', branch: 'CoWork Hub', active: true },
+        { id: 6, name: 'Hot Desk Area', type: 'desk', capacity: 10, booked: 3, desc: 'Open collaboration area. Standing desks available.', branch: 'CoWork Hub', active: true },
+        { id: 7, name: 'Meeting Room A', type: 'room', capacity: 8, booked: 8, desc: 'Fully equipped boardroom with projector, whiteboard, AC.', branch: 'Enterprise Floor', active: true },
+        { id: 8, name: 'Phone Booth 1', type: 'room', capacity: 1, booked: 0, desc: 'Soundproof booth for private calls and focus sessions.', branch: 'Enterprise Floor', active: false },
+      ],
+      slots: [
+        { id: 1, time: '08:00–09:00', capacity: 6, booked: 2, status: 'open' },
+        { id: 2, time: '10:00–11:00', capacity: 6, booked: 5, status: 'open' },
+        { id: 3, time: '12:00–13:00', capacity: 4, booked: 4, status: 'full' },
+        { id: 4, time: '14:00–15:00', capacity: 6, booked: 1, status: 'open' },
+        { id: 5, time: '16:00–17:00', capacity: 6, booked: 3, status: 'open' },
+        { id: 6, time: '18:00–19:00', capacity: 6, booked: 6, status: 'full' },
+        { id: 7, time: '19:00–20:00', capacity: 4, booked: 2, status: 'open' },
+        { id: 8, time: '20:00–21:00', capacity: 4, booked: 0, status: 'open' },
+      ]
+    };
+
+    // ─── SVG ICONS ────────────────────────────────
+    const icons = {
+      menu: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>`,
+      x: `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>`,
+      grid: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>`,
+      calendar: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>`,
+      bookmark: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>`,
+      users: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>`,
+      settings: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`,
+      chart: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>`,
+      check: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg>`,
+      plus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+      bell: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>`,
+      home: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+      search: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
+      arrow_right: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+      clock: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>`,
+      map: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>`,
+      shield: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+      box: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>`,
+      trend: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>`,
+      user: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+    };
+
+    // ─── UTILITIES ────────────────────────────────
+    function getCapacityClass(booked, cap) {
+      const pct = booked / cap;
+      if (pct >= 1) return 'high';
+      if (pct >= 0.6) return 'mid';
+      return 'low';
+    }
+    function getCapacityPct(booked, cap) { return Math.round((booked / cap) * 100); }
+    function typeIcon(type) {
+      const map = { lesson: '📚', cafe: '☕', desk: '💻', room: '🏢' };
+      return map[type] || '📦';
+    }
+    const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    function formatDate(d) { return `${days[d.getDay()]} ${months[d.getMonth()]} ${d.getDate()}`; }
+
+    // ─── TOAST ────────────────────────────────────
+    function showToast(msg, type = 'success') {
+      const icons_map = { success: '✓', error: '✕', info: 'ℹ' };
+      const tc = document.getElementById('toastContainer');
+      const t = document.createElement('div');
+      t.className = `toast ${type} fade-in`;
+      t.innerHTML = `<span class="toast-icon" style="font-size:1rem">${icons_map[type]}</span><span>${msg}</span>`;
+      tc.appendChild(t);
+      setTimeout(() => t.remove(), 3200);
+    }
+
+    // ─── RENDER ───────────────────────────────────
+    function render() {
+      const app = document.getElementById('app');
+      if (store.currentView === 'landing') { app.innerHTML = renderLanding(); bindLanding(); return; }
+      if (store.currentView === 'login') { app.innerHTML = renderAuth('login'); bindAuth(); return; }
+      if (store.currentView === 'register') { app.innerHTML = renderAuth('register'); bindAuth(); return; }
+
+      app.innerHTML = `
+    <div class="app">
+      ${renderTopbar()}
+      <div class="main-layout">
+        ${store.isAdmin ? renderSidebar() : ''}
+        <div class="content-area" id="contentArea">
+          ${renderView()}
+        </div>
+      </div>
+      ${!store.isAdmin ? renderMobileNav() : renderAdminMobileNav()}
+    </div>
+    ${renderMobileDrawer()}
+    ${store.showModal ? renderModal() : ''}
+  `;
+      bindAll();
+    }
+
+    // ─── LANDING ──────────────────────────────────
+    function renderLanding() {
+      return `
+  <div class="landing">
+    <div class="topbar">
+      <div class="topbar-logo">Boş Yer Var MI ? <span>Platform</span></div>
+      <div class="topbar-spacer"></div>
+      <button class="btn btn-ghost btn-sm" onclick="nav('login')">Sign in</button>
+      <button class="btn btn-primary btn-sm" onclick="nav('register')">Get started</button>
+    </div>
+    <div class="hero fade-in">
+      <div class="hero-badge">✦ Flexible Reservation Platform</div>
+      <h1 class="hero-title">
+        Book anything,<br><span>manage everything</span>
+      </h1>
+      <p class="hero-sub">
+        One platform for lesson scheduling, café tables, coworking desks, meeting rooms, and any capacity-based booking scenario.
+      </p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" onclick="nav('register')">${icons.plus} Start for free</button>
+        <button class="btn btn-secondary btn-lg" onclick="demoAdmin()">View admin demo ${icons.arrow_right}</button>
+      </div>
+      <div class="feature-pills">
+        <div class="feature-pill">✓ Multi-resource types</div>
+        <div class="feature-pill">✓ Capacity management</div>
+        <div class="feature-pill">✓ Waitlist support</div>
+        <div class="feature-pill">✓ Custom booking rules</div>
+        <div class="feature-pill">✓ Mobile-first</div>
+      </div>
+    </div>
+    <div style="padding:0 24px 20px;text-align:center">
+      <h2 class="font-syne" style="font-size:1.1rem;font-weight:700;color:var(--text2);letter-spacing:-0.01em;margin-bottom:4px">Works for every use case</h2>
+    </div>
+    <div class="use-cases">
+      <div class="use-case" onclick="demoUser()">
+        <div class="use-case-icon">📚</div>
+        <div class="use-case-name">Education & Classes</div>
+        <div class="use-case-desc">Lesson groups, workshops, tutoring sessions with recurring schedules</div>
+      </div>
+      <div class="use-case" onclick="demoUser()">
+        <div class="use-case-icon">☕</div>
+        <div class="use-case-name">Café & Restaurant</div>
+        <div class="use-case-desc">Table reservations with party size, time windows, and walk-in rules</div>
+      </div>
+      <div class="use-case" onclick="demoUser()">
+        <div class="use-case-icon">💻</div>
+        <div class="use-case-name">Coworking Space</div>
+        <div class="use-case-desc">Hot desks, private offices, and day-passes with member tiers</div>
+      </div>
+      <div class="use-case" onclick="demoUser()">
+        <div class="use-case-icon">🏢</div>
+        <div class="use-case-name">Room & Resources</div>
+        <div class="use-case-desc">Meeting rooms, equipment, vehicles — any reservable resource</div>
+      </div>
+    </div>
+    <div style="text-align:center;padding:32px 24px 60px;color:var(--text3);font-size:0.8rem">
+      © 2026 BosYerVarMi.com • Built with ♥ for multi-tenant SaaS
+    </div>
+  </div>`;
+    }
+    function bindLanding() { }
+
+    // ─── AUTH ─────────────────────────────────────
+    function renderAuth(mode) {
+      const isLogin = mode === 'login';
+      return `
+  <div class="auth-page">
+    <div class="auth-card card fade-in">
+      <div class="auth-header">
+        <div class="auth-logo">Reservely</div>
+        <p style="font-size:0.875rem;color:var(--text2)">${isLogin ? 'Welcome back' : 'Create your account'}</p>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        ${!isLogin ? `
+        <div class="form-group">
+          <label class="form-label">Full name</label>
+          <input type="text" class="form-input" placeholder="Ayşe Kaya" id="authName">
+        </div>` : ''}
+        <div class="form-group">
+          <label class="form-label">Email address</label>
+          <input type="email" class="form-input" placeholder="you@example.com" id="authEmail" value="${isLogin ? 'admin@reservely.io' : ''}">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <input type="password" class="form-input" placeholder="••••••••" id="authPass" value="${isLogin ? 'demo123' : ''}">
+        </div>
+        ${isLogin ? `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-top:-4px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:0.82rem;color:var(--text2)">
+            <input type="checkbox" style="accent-color:var(--accent)"> Remember me
+          </label>
+          <a href="#" style="font-size:0.82rem;color:var(--accent2);text-decoration:none">Forgot password?</a>
+        </div>` : `
+        <div class="form-group">
+          <label class="form-label">Account type</label>
+          <select class="form-select" id="authRole">
+            <option value="customer">Customer / Guest</option>
+            <option value="business_admin">Business Admin</option>
+          </select>
+        </div>`}
+        <button class="btn btn-primary w-full" style="justify-content:center;margin-top:4px" id="authSubmit">
+          ${isLogin ? 'Sign in' : 'Create account'} ${icons.arrow_right}
+        </button>
+        <div style="text-align:center;font-size:0.82rem;color:var(--text2)">
+          ${isLogin ? `Don't have an account? <a href="#" onclick="nav('register')" style="color:var(--accent2);text-decoration:none">Sign up</a>`
+          : `Already have an account? <a href="#" onclick="nav('login')" style="color:var(--accent2);text-decoration:none">Sign in</a>`}
+        </div>
+        <div class="divider" style="text-align:center;position:relative">
+          <span style="position:absolute;left:50%;transform:translateX(-50%);background:var(--surface);padding:0 12px;color:var(--text3);font-size:0.75rem;top:-9px">or try demo</span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn btn-secondary w-full" style="justify-content:center;font-size:0.8rem" onclick="demoUser()">👤 User demo</button>
+          <button class="btn btn-secondary w-full" style="justify-content:center;font-size:0.8rem" onclick="demoAdmin()">⚙ Admin demo</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+    }
+    function bindAuth() {
+      const btn = document.getElementById('authSubmit');
+      if (btn) btn.addEventListener('click', () => {
+        const email = document.getElementById('authEmail')?.value;
+        if (!email) { showToast('Please enter your email', 'error'); return; }
+        store.user = { name: 'Ayşe Kaya', email, role: 'customer' };
+        store.isAdmin = false;
+        nav('browse');
+        showToast('Welcome to Reservely!');
+      });
+    }
+
+    function demoUser() {
+      store.user = { name: 'Ayşe Kaya', email: 'ayse@example.com', role: 'customer' };
+      store.isAdmin = false;
+      nav('browse');
+      showToast('Logged in as demo user');
+    }
+    function demoAdmin() {
+      store.user = { name: 'Admin', email: 'admin@reservely.io', role: 'super_admin' };
+      store.isAdmin = true;
+      nav('dashboard');
+      showToast('Logged in as admin');
+    }
+
+    // ─── TOPBAR ───────────────────────────────────
+    function renderTopbar() {
+      return `
+  <div class="topbar">
+    <button class="mobile-menu-btn" id="menuBtn" style="display:flex">${icons.menu}</button>
+    <div class="topbar-logo">Boş Yer Var MI ? <span>${store.isAdmin ? 'Admin' : 'Platform'}</span></div>
+    <div class="topbar-spacer"></div>
+    ${!store.isAdmin ? `
+    <nav class="topbar-nav">
+      <button class="${store.currentView === 'browse' ? 'active' : ''}" onclick="nav('browse')">Explore</button>
+      <button class="${store.currentView === 'my-bookings' ? 'active' : ''}" onclick="nav('my-bookings')">My Bookings</button>
+    </nav>` : ''}
+    <button class="btn btn-ghost btn-sm" style="padding:6px 10px">${icons.bell}</button>
+    <div class="avatar" onclick="nav('profile')">${store.user?.name?.charAt(0) || '?'}</div>
+  </div>`;
+    }
+
+    // ─── SIDEBAR ──────────────────────────────────
+    function renderSidebar() {
+      const items = [
+        { id: 'dashboard', label: 'Dashboard', icon: 'chart' },
+        { id: 'resources', label: 'Resources', icon: 'box' },
+        { id: 'schedule', label: 'Schedule', icon: 'calendar' },
+        { id: 'reservations', label: 'Reservations', icon: 'bookmark', badge: 3 },
+        { id: 'users', label: 'Users', icon: 'users' },
+        { id: 'policies', label: 'Booking Rules', icon: 'shield' },
+        { id: 'settings', label: 'Settings', icon: 'settings' },
+      ];
+      return `
+  <div class="sidebar">
+    ${items.map(it => `
+    <button class="sidebar-item ${store.currentView === it.id ? 'active' : ''}" onclick="nav('${it.id}')">
+      ${icons[it.icon]}
+      ${it.label}
+      ${it.badge ? `<span class="sidebar-badge">${it.badge}</span>` : ''}
+    </button>`).join('')}
+    <div style="flex:1"></div>
+    <div class="divider" style="margin:8px 0"></div>
+    <button class="sidebar-item" onclick="store.isAdmin=false;store.user.role='customer';nav('browse')">
+      ${icons.home} User view
+    </button>
+    <button class="sidebar-item" onclick="nav('landing')">
+      ${icons.x} Sign out
+    </button>
+  </div>`;
+    }
+
+    // ─── MOBILE DRAWER ────────────────────────────
+    function renderMobileDrawer() {
+      const adminItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: 'chart' },
+        { id: 'resources', label: 'Resources', icon: 'box' },
+        { id: 'schedule', label: 'Schedule', icon: 'calendar' },
+        { id: 'reservations', label: 'Reservations', icon: 'bookmark' },
+        { id: 'users', label: 'Users', icon: 'users' },
+        { id: 'policies', label: 'Booking Rules', icon: 'shield' },
+        { id: 'settings', label: 'Settings', icon: 'settings' },
+      ];
+      const userItems = [
+        { id: 'browse', label: 'Explore', icon: 'search' },
+        { id: 'my-bookings', label: 'My Bookings', icon: 'bookmark' },
+        { id: 'profile', label: 'Profile', icon: 'user' },
+      ];
+      const items = store.isAdmin ? adminItems : userItems;
+      return `
+  <div class="mobile-overlay" id="drawerOverlay" onclick="closeDrawer()" style="display:${store.mobileDrawerOpen ? 'block' : 'none'}"></div>
+  <div class="mobile-drawer ${store.mobileDrawerOpen ? 'open' : ''}" id="mobileDrawer">
+    <div class="drawer-header">
+      <div class="topbar-logo">Boş Yer Var MI ?</div>
+      <button class="close-btn" onclick="closeDrawer()">${icons.x}</button>
+    </div>
+    ${items.map(it => `
+    <button class="sidebar-item ${store.currentView === it.id ? 'active' : ''}" onclick="nav('${it.id}');closeDrawer()">
+      ${icons[it.icon]} ${it.label}
+    </button>`).join('')}
+    <div style="flex:1"></div>
+    <div class="divider" style="margin:8px 0"></div>
+    ${store.isAdmin ? `<button class="sidebar-item" onclick="store.isAdmin=false;nav('browse');closeDrawer()">${icons.home} User view</button>` :
+          `<button class="sidebar-item" onclick="store.isAdmin=true;nav('dashboard');closeDrawer()">${icons.settings} Admin panel</button>`}
+    <button class="sidebar-item" onclick="nav('landing');closeDrawer()">${icons.x} Sign out</button>
+  </div>`;
+    }
+
+    function renderMobileNav() {
+      const items = [
+        { id: 'browse', icon: 'search', label: 'Explore' },
+        { id: 'my-bookings', icon: 'bookmark', label: 'Bookings' },
+        { id: 'profile', icon: 'user', label: 'Profile' },
+      ];
+      return `
+  <nav class="mobile-bottom-nav">
+    <div class="mobile-nav-items">
+      ${items.map(it => `
+      <button class="mobile-nav-item ${store.currentView === it.id ? 'active' : ''}" onclick="nav('${it.id}')">
+        ${icons[it.icon].replace('width="16" height="16"', 'width="22" height="22"')}
+        <span>${it.label}</span>
+      </button>`).join('')}
+    </div>
+  </nav>`;
+    }
+
+    function renderAdminMobileNav() {
+      const items = [
+        { id: 'dashboard', icon: 'chart', label: 'Dash' },
+        { id: 'resources', icon: 'box', label: 'Resources' },
+        { id: 'reservations', icon: 'bookmark', label: 'Bookings' },
+        { id: 'schedule', icon: 'calendar', label: 'Schedule' },
+      ];
+      return `
+  <nav class="mobile-bottom-nav">
+    <div class="mobile-nav-items">
+      ${items.map(it => `
+      <button class="mobile-nav-item ${store.currentView === it.id ? 'active' : ''}" onclick="nav('${it.id}')">
+        ${icons[it.icon].replace('width="16" height="16"', 'width="22" height="22"')}
+        <span>${it.label}</span>
+      </button>`).join('')}
+    </div>
+  </nav>`;
+    }
+
+    // ─── VIEWS ────────────────────────────────────
+    function renderView() {
+      const views = {
+        dashboard: renderDashboard,
+        browse: renderBrowse,
+        resources: renderResources,
+        schedule: renderSchedule,
+        reservations: renderReservations,
+        'my-bookings': renderMyBookings,
+        users: renderUsers,
+        policies: renderPolicies,
+        settings: renderSettings,
+        profile: renderProfile,
+        booking: renderBookingFlow,
+      };
+      const fn = views[store.currentView];
+      return fn ? fn() : `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-title">Page not found</div></div>`;
+    }
+
+    // ─── DASHBOARD ────────────────────────────────
+    function renderDashboard() {
+      const bars = [45, 72, 58, 90, 65, 80, 55, 88, 70, 95, 60, 78];
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-subtitle">Monday, April 14 — Good morning, Admin</div>
+      </div>
+      <button class="btn btn-primary" onclick="nav('resources')">${icons.plus} New resource</button>
+    </div>
+    <div class="section">
+      <div class="card-grid" style="grid-template-columns:repeat(auto-fill,minmax(200px,1fr))">
+        <div class="stat-card purple">
+          <div class="stat-label">Total Reservations</div>
+          <div class="stat-value">284</div>
+          <div class="stat-change up">${icons.trend} +12% this week</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Active Slots Today</div>
+          <div class="stat-value">18</div>
+          <div class="stat-change up">${icons.trend} 3 slots remaining</div>
+        </div>
+        <div class="stat-card green">
+          <div class="stat-label">Occupancy Rate</div>
+          <div class="stat-value">73%</div>
+          <div class="stat-change up">${icons.trend} Up from 64%</div>
+        </div>
+        <div class="stat-card amber">
+          <div class="stat-label">Waitlisted</div>
+          <div class="stat-value">7</div>
+          <div class="stat-change down" style="color:var(--warning)">2 new today</div>
+        </div>
+      </div>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="card">
+          <div class="section-title">Reservations this week</div>
+          <div class="chart-area">
+            ${bars.map(h => `<div class="chart-bar" style="height:${h}%"></div>`).join('')}
+          </div>
+          <div style="display:flex;justify-content:space-between;margin-top:8px;font-size:0.72rem;color:var(--text3)">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span><span>Sun</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Resource breakdown</div>
+          ${store.resources.slice(0, 5).map(r => `
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+            <span style="font-size:1rem;width:24px;text-align:center">${typeIcon(r.type)}</span>
+            <div style="flex:1;min-width:0">
+              <div style="font-size:0.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${r.name}</div>
+              <div class="capacity-bar" style="margin:4px 0 0;height:5px">
+                <div class="capacity-fill ${getCapacityClass(r.booked, r.capacity)}" style="width:${getCapacityPct(r.booked, r.capacity)}%"></div>
+              </div>
+            </div>
+            <div style="font-size:0.75rem;color:var(--text2);white-space:nowrap">${r.booked}/${r.capacity}</div>
+          </div>`).join('')}
+        </div>
+      </div>
+    </div>
+    <div class="section" style="padding-top:0">
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+          <div class="section-title" style="margin-bottom:0">Recent reservations</div>
+          <button class="btn btn-ghost btn-sm" onclick="nav('reservations')">View all ${icons.arrow_right}</button>
+        </div>
+        ${renderReservationTable(store.reservations.slice(0, 4))}
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── BROWSE (USER) ────────────────────────────
+    function renderBrowse() {
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Explore</div>
+        <div class="page-subtitle">Find and book available resources</div>
+      </div>
+    </div>
+    <div class="section">
+      <div style="position:relative;margin-bottom:20px">
+        <div style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3)">${icons.search}</div>
+        <input class="form-input" style="padding-left:40px" placeholder="Search resources, locations…" id="searchInput" oninput="filterResources(this.value)">
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px">
+        ${['All', 'Lesson', 'Café', 'Desk', 'Room'].map(t => `
+        <button class="btn btn-sm ${t === 'All' ? 'btn-primary' : 'btn-secondary'}" data-filter="${t.toLowerCase()}"
+          onclick="filterByType('${t.toLowerCase()}')">${t === 'All' ? 'All types' : ''}${t === 'Lesson' ? '📚 ' + t : ''}${t === 'Café' ? '☕ ' + t : ''}${t === 'Desk' ? '💻 ' + t : ''}${t === 'Room' ? '🏢 ' + t : ''}${t === 'All' ? '' : ''}</button>`).join('')}
+      </div>
+      <div class="card-grid" id="resourceGrid">
+        ${renderResourceCards(store.resources)}
+      </div>
+    </div>
+  </div>`;
+    }
+
+    function renderResourceCards(resources) {
+      return resources.filter(r => r.active).map(r => `
+  <div class="resource-card" onclick="openBooking(${r.id})">
+    <div class="resource-card-header">
+      <div class="resource-icon ${r.type}">${typeIcon(r.type)}</div>
+      <div>
+        <div class="resource-name">${r.name}</div>
+        <span class="resource-type ${r.type}">${r.type}</span>
+      </div>
+    </div>
+    <div class="resource-card-body">${r.desc}</div>
+    <div class="resource-card-footer">
+      <span style="font-size:0.78rem;display:flex;align-items:center;gap:4px;color:var(--text2)">${icons.map} ${r.branch}</span>
+      <div class="capacity-bar"><div class="capacity-fill ${getCapacityClass(r.booked, r.capacity)}" style="width:${getCapacityPct(r.booked, r.capacity)}%"></div></div>
+      <span style="font-size:0.78rem;color:var(--text2)">${r.capacity - r.booked} free</span>
+    </div>
+  </div>`).join('');
+    }
+
+    // ─── BOOKING FLOW ─────────────────────────────
+    function renderBookingFlow() {
+      const resource = store.resources.find(r => r.id === store.bookingResourceId) || store.resources[0];
+      const step = store.bookingStep;
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Book ${resource.name}</div>
+        <div class="page-subtitle">${typeIcon(resource.type)} ${resource.type} • ${resource.branch}</div>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="nav('browse')">← Back</button>
+    </div>
+    <div class="section">
+      <div class="booking-flow">
+        <div class="stepper">
+          ${[['1', 'Date'], ['2', 'Slot'], ['3', 'Confirm']].map(([n, l], i) => `
+          <div class="step-item ${step > i + 1 ? 'done' : step === i + 1 ? 'active' : ''}">
+            <div class="step-circle">${step > i + 1 ? icons.check : n}</div>
+            <div class="step-label">${l}</div>
+          </div>
+          ${i < 2 ? `<div class="step-line ${step > i + 1 ? 'done' : ''}"></div>` : ''}`).join('')}
+        </div>
+
+        ${step === 1 ? `
+        <div class="booking-step">
+          <div class="step-header">
+            <div class="step-num">1</div>
+            <div class="step-title">Select a date</div>
+          </div>
+          <div class="cal-strip" id="calStrip">
+            ${Array.from({ length: 14 }, (_, i) => {
+        const d = new Date(); d.setDate(d.getDate() + i);
+        const isToday = i === 0;
+        const isSel = store.selectedDate && store.selectedDate.toDateString() === d.toDateString();
+        return `
+              <div class="cal-day ${isSel ? 'selected' : ''} ${isToday && !isSel ? 'today' : ''}" onclick="selectDate(${d.getTime()})">
+                <div class="cal-dow">${days[d.getDay()]}</div>
+                <div class="cal-date">${d.getDate()}</div>
+                <div class="cal-dot"></div>
+              </div>`;
+      }).join('')}
+          </div>
+          <div class="mt-4 flex justify-between items-center">
+            <span class="text-sm text-muted">Selected: <strong style="color:var(--text)">${formatDate(store.selectedDate || new Date())}</strong></span>
+            <button class="btn btn-primary" onclick="store.bookingStep=2;render()">Continue ${icons.arrow_right}</button>
+          </div>
+        </div>` : ''}
+
+        ${step === 2 ? `
+        <div class="booking-step">
+          <div class="step-header">
+            <div class="step-num">2</div>
+            <div class="step-title">Choose a time slot</div>
+          </div>
+          <div class="slot-grid">
+            ${store.slots.map(s => `
+            <div class="slot-card ${s.status} ${store.selectedSlot === s.id ? 'selected' : ''}"
+              onclick="${s.status !== 'closed' ? `selectSlot(${s.id})` : ''}">
+              <div class="slot-time">${s.time.split('–')[0]}</div>
+              <div class="slot-time" style="font-size:0.75rem;font-weight:400;color:var(--text2)">–${s.time.split('–')[1]}</div>
+              <span class="slot-status ${s.status === 'full' ? 'full' : 'open'}">${s.status}</span>
+              <div class="slot-avail ${s.status === 'full' ? 'full' : s.capacity - s.booked <= 1 ? 'low' : ''}">${s.status === 'full' ? 'Full' : s.capacity - s.booked + ' left'}</div>
+            </div>`).join('')}
+          </div>
+          <div class="mt-4 flex justify-between items-center">
+            <button class="btn btn-secondary" onclick="store.bookingStep=1;render()">← Back</button>
+            <button class="btn btn-primary" onclick="${store.selectedSlot ? 'store.bookingStep=3;render()' : 'showToast(\'Please select a slot\',\'error\')'}"
+              ${!store.selectedSlot ? 'style="opacity:0.6"' : ''}>
+              Continue ${icons.arrow_right}
+            </button>
+          </div>
+        </div>` : ''}
+
+        ${step === 3 ? `
+        <div class="booking-step">
+          <div class="step-header">
+            <div class="step-num step-complete">3</div>
+            <div class="step-title">Confirm reservation</div>
+          </div>
+          <div style="background:var(--surface2);border-radius:var(--radius-sm);padding:16px;margin-bottom:16px">
+            <div class="text-xs text-muted2" style="margin-bottom:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase">Summary</div>
+            ${[
+            ['Resource', resource.name],
+            ['Date', formatDate(store.selectedDate || new Date())],
+            ['Time', store.slots.find(s => s.id === store.selectedSlot)?.time || '—'],
+            ['Location', resource.branch],
+            ['Status', 'Will be confirmed instantly'],
+          ].map(([k, v]) => `
+            <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+              <span class="text-sm text-muted">${k}</span>
+              <span class="text-sm font-bold">${v}</span>
+            </div>`).join('')}
+          </div>
+          <div class="form-group mb-4">
+            <label class="form-label">Special notes (optional)</label>
+            <textarea class="form-textarea" placeholder="Any special requirements or notes…" rows="2"></textarea>
+          </div>
+          <div style="display:flex;gap:10px">
+            <button class="btn btn-secondary" onclick="store.bookingStep=2;render()">← Back</button>
+            <button class="btn btn-primary w-full" style="justify-content:center" onclick="confirmBooking()">
+              ${icons.check} Confirm Reservation
+            </button>
+          </div>
+        </div>` : ''}
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── RESOURCES (ADMIN) ────────────────────────
+    function renderResources() {
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Resources</div>
+        <div class="page-subtitle">${store.resources.length} resources across all branches</div>
+      </div>
+      <button class="btn btn-primary" onclick="store.showModal='newResource';render()">${icons.plus} Add resource</button>
+    </div>
+    <div class="section">
+      <div class="tabs mb-4">
+        <button class="tab-btn active">All</button>
+        <button class="tab-btn">📚 Lessons</button>
+        <button class="tab-btn">☕ Café</button>
+        <button class="tab-btn">💻 Desks</button>
+        <button class="tab-btn">🏢 Rooms</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Resource</th>
+              <th>Type</th>
+              <th>Branch</th>
+              <th>Capacity</th>
+              <th>Occupancy</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${store.resources.map(r => `
+            <tr>
+              <td data-label="Resource">
+                <div class="td-name" style="display:flex;align-items:center;gap:8px">
+                  <span>${typeIcon(r.type)}</span>${r.name}
+                </div>
+                <div class="td-sub">${r.desc.slice(0, 40)}…</div>
+              </td>
+              <td data-label="Type"><span class="resource-type ${r.type}">${r.type}</span></td>
+              <td data-label="Branch" style="color:var(--text2);font-size:0.85rem">${r.branch}</td>
+              <td data-label="Capacity" style="font-family:'Syne',sans-serif;font-weight:700">${r.capacity}</td>
+              <td data-label="Occupancy">
+                <div style="display:flex;align-items:center;gap:8px;min-width:100px">
+                  <div class="capacity-bar" style="margin:0"><div class="capacity-fill ${getCapacityClass(r.booked, r.capacity)}" style="width:${getCapacityPct(r.booked, r.capacity)}%"></div></div>
+                  <span style="font-size:0.78rem;color:var(--text2);white-space:nowrap">${r.booked}/${r.capacity}</span>
+                </div>
+              </td>
+              <td data-label="Status"><span class="badge ${r.active ? 'active' : 'inactive'}">${r.active ? 'Active' : 'Inactive'}</span></td>
+              <td data-label="Actions">
+                <div style="display:flex;gap:6px">
+                  <button class="btn btn-ghost btn-sm">Edit</button>
+                  <button class="btn btn-ghost btn-sm" style="color:var(--danger)">Delete</button>
+                </div>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── SCHEDULE ────────────────────────────────
+    function renderSchedule() {
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Schedule</div>
+        <div class="page-subtitle">Manage time slots and capacity</div>
+      </div>
+      <button class="btn btn-primary" onclick="store.showModal='newSlot';render()">${icons.plus} New slot</button>
+    </div>
+    <div class="section">
+      <div style="display:flex;gap:12px;align-items:center;margin-bottom:16px;flex-wrap:wrap">
+        <select class="form-select" style="width:auto">
+          <option>Python Basics</option>
+          <option>Table #4</option>
+          <option>Focus Desk B7</option>
+          <option>Meeting Room A</option>
+        </select>
+        <div class="tabs" style="flex:1">
+          <button class="tab-btn active">Week view</button>
+          <button class="tab-btn">Day view</button>
+          <button class="tab-btn">List</button>
+        </div>
+      </div>
+      <div class="cal-strip mb-4">
+        ${Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(); d.setDate(d.getDate() + i);
+        return `
+          <div class="cal-day ${i === 0 ? 'selected' : ''}" onclick="this.parentElement.querySelectorAll('.cal-day').forEach(x=>x.classList.remove('selected'));this.classList.add('selected')">
+            <div class="cal-dow">${days[d.getDay()]}</div>
+            <div class="cal-date">${d.getDate()}</div>
+            <div class="cal-dot"></div>
+          </div>`;
+      }).join('')}
+      </div>
+      <div class="card">
+        <div class="section-title">Today's slots — Monday Apr 14</div>
+        <div class="slot-grid">
+          ${store.slots.map(s => `
+          <div class="slot-card ${s.status}" style="cursor:default;position:relative">
+            <div style="position:absolute;top:6px;right:6px">
+              <button class="btn btn-ghost btn-sm" style="padding:2px 6px;font-size:0.7rem" onclick="showToast('Slot edited')">…</button>
+            </div>
+            <div class="slot-time">${s.time.split('–')[0]}</div>
+            <div class="slot-time" style="font-size:0.75rem;color:var(--text2)">–${s.time.split('–')[1]}</div>
+            <span class="slot-status ${s.status === 'full' ? 'full' : 'open'}">${s.status}</span>
+            <div style="font-size:0.72rem;color:var(--text2)">${s.booked}/${s.capacity} booked</div>
+          </div>`).join('')}
+        </div>
+        <div class="mt-4 flex justify-between items-center">
+          <span class="text-sm text-muted">8 slots configured</span>
+          <button class="btn btn-secondary btn-sm" onclick="showToast('Recurring template applied!')">Apply recurring template</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── RESERVATIONS (ADMIN) ─────────────────────
+    function renderReservations() {
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Reservations</div>
+        <div class="page-subtitle">${store.reservations.length} total bookings</div>
+      </div>
+      <button class="btn btn-secondary btn-sm">Export CSV</button>
+    </div>
+    <div class="section">
+      <div style="display:flex;gap:10px;margin-bottom:16px;flex-wrap:wrap">
+        <div style="position:relative;flex:1;min-width:200px">
+          <div style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3)">${icons.search}</div>
+          <input class="form-input" style="padding-left:40px" placeholder="Search by name, resource…">
+        </div>
+        <select class="form-select" style="width:auto">
+          <option>All statuses</option>
+          <option>Confirmed</option>
+          <option>Pending</option>
+          <option>Cancelled</option>
+          <option>Waitlist</option>
+        </select>
+        <select class="form-select" style="width:auto">
+          <option>All types</option>
+          <option>Lesson</option>
+          <option>Café</option>
+          <option>Desk</option>
+          <option>Room</option>
+        </select>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Attendee</th>
+              <th>Resource</th>
+              <th>Date & Slot</th>
+              <th>Seats</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${store.reservations.map((r, i) => `
+            <tr>
+              <td data-label="ID" style="color:var(--text3);font-size:0.78rem">#${String(r.id).padStart(4, '0')}</td>
+              <td data-label="Attendee">
+                <div style="display:flex;align-items:center;gap:8px">
+                  <div class="avatar" style="width:28px;height:28px;font-size:0.7rem">${r.attendee.charAt(0)}</div>
+                  <span class="td-name">${r.attendee}</span>
+                </div>
+              </td>
+              <td data-label="Resource">
+                <div class="td-name">${r.resource}</div>
+                <div class="td-sub">${r.type}</div>
+              </td>
+              <td data-label="Date & Slot">
+                <div class="td-name">${r.date}</div>
+                <div class="td-sub">${r.slot}</div>
+              </td>
+              <td data-label="Seats" style="font-weight:600">${r.seats}</td>
+              <td data-label="Status"><span class="badge ${r.status}">${r.status}</span></td>
+              <td data-label="Actions">
+                <div style="display:flex;gap:4px;flex-wrap:wrap">
+                  ${r.status === 'pending' ? `<button class="btn btn-sm" style="background:rgba(52,211,153,0.15);color:var(--success);border:1px solid rgba(52,211,153,0.2)" onclick="confirmRes(${r.id})">Confirm</button>` : ''}
+                  ${r.status !== 'cancelled' ? `<button class="btn btn-danger btn-sm" onclick="cancelRes(${r.id})">Cancel</button>` : ''}
+                </div>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    function renderReservationTable(reservations) {
+      return `
+  <div class="table-wrap">
+    <table>
+      <thead><tr>
+        <th>Attendee</th><th>Resource</th><th>Date</th><th>Status</th>
+      </tr></thead>
+      <tbody>
+        ${reservations.map(r => `
+        <tr>
+          <td data-label="Attendee">
+            <div style="display:flex;align-items:center;gap:8px">
+              <div class="avatar" style="width:26px;height:26px;font-size:0.65rem">${r.attendee.charAt(0)}</div>
+              <span>${r.attendee}</span>
+            </div>
+          </td>
+          <td data-label="Resource">
+            <div>${r.resource}</div>
+            <div class="td-sub">${r.slot}</div>
+          </td>
+          <td data-label="Date" style="color:var(--text2);font-size:0.82rem">${r.date}</td>
+          <td data-label="Status"><span class="badge ${r.status}">${r.status}</span></td>
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+    }
+
+    // ─── MY BOOKINGS (USER) ───────────────────────
+    function renderMyBookings() {
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div>
+        <div class="page-title">My Bookings</div>
+        <div class="page-subtitle">Your upcoming and past reservations</div>
+      </div>
+    </div>
+    <div class="section">
+      <div class="tabs mb-4">
+        <button class="tab-btn active">Upcoming</button>
+        <button class="tab-btn">Past</button>
+        <button class="tab-btn">Cancelled</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${store.reservations.filter(r => r.status !== 'cancelled').map(r => `
+        <div class="card" style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+          <div style="width:48px;height:48px;background:var(--surface2);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0">
+            ${typeIcon(r.type)}
+          </div>
+          <div style="flex:1;min-width:160px">
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1rem">${r.resource}</div>
+            <div style="font-size:0.82rem;color:var(--text2);margin-top:3px;display:flex;align-items:center;gap:8px">
+              ${icons.calendar} ${r.date}
+              <span style="color:var(--border2)">•</span>
+              ${icons.clock} ${r.slot}
+            </div>
+          </div>
+          <span class="badge ${r.status}">${r.status}</span>
+          ${r.status !== 'cancelled' ? `<button class="btn btn-danger btn-sm" onclick="cancelRes(${r.id})">Cancel</button>` : ''}
+        </div>`).join('')}
+      </div>
+      <div class="mt-4" style="text-align:center">
+        <button class="btn btn-primary" onclick="nav('browse')">${icons.plus} Make new booking</button>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── USERS ───────────────────────────────────
+    function renderUsers() {
+      const users = [
+        { name: 'Ayşe Kaya', email: 'ayse@example.com', role: 'customer', bookings: 8, joined: 'Mar 2026' },
+        { name: 'Mehmet Demir', email: 'mehmet@example.com', role: 'customer', bookings: 3, joined: 'Jan 2026' },
+        { name: 'Sara Öztürk', email: 'sara@example.com', role: 'staff', bookings: 0, joined: 'Feb 2026' },
+        { name: 'Ali Yıldız', email: 'ali@example.com', role: 'business_admin', bookings: 1, joined: 'Nov 2025' },
+        { name: 'Fatma Çelik', email: 'fatma@example.com', role: 'customer', bookings: 15, joined: 'Oct 2025' },
+      ];
+      const roleColors = { customer: 'badge active', staff: 'badge waitlist', business_admin: 'badge pending', super_admin: 'badge confirmed' };
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div><div class="page-title">Users</div>
+      <div class="page-subtitle">${users.length} registered users</div></div>
+      <button class="btn btn-primary">${icons.plus} Invite user</button>
+    </div>
+    <div class="section">
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>User</th><th>Role</th><th>Bookings</th><th>Joined</th><th>Actions</th></tr></thead>
+          <tbody>
+            ${users.map(u => `
+            <tr>
+              <td data-label="User">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <div class="avatar" style="width:32px;height:32px">${u.name.charAt(0)}</div>
+                  <div>
+                    <div class="td-name">${u.name}</div>
+                    <div class="td-sub">${u.email}</div>
+                  </div>
+                </div>
+              </td>
+              <td data-label="Role"><span class="${roleColors[u.role] || 'badge'}">${u.role}</span></td>
+              <td data-label="Bookings" style="font-weight:600">${u.bookings}</td>
+              <td data-label="Joined" style="color:var(--text2);font-size:0.82rem">${u.joined}</td>
+              <td data-label="Actions">
+                <button class="btn btn-ghost btn-sm">Edit</button>
+              </td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── POLICIES ─────────────────────────────────
+    function renderPolicies() {
+      const rules = [
+        { key: 'max_per_day', label: 'Max bookings per user/day', desc: 'Prevent users from making more than N bookings in a day', value: '3', type: 'number', on: true },
+        { key: 'approval', label: 'Require approval', desc: 'Reservations need admin confirmation before being confirmed', type: 'toggle', on: false },
+        { key: 'waitlist', label: 'Enable waitlist', desc: 'When capacity is full, allow users to join a waitlist', type: 'toggle', on: true },
+        { key: 'cutoff', label: 'Reservation cutoff', desc: 'How far in advance must a booking be made (hours)', value: '2', type: 'number', on: true },
+        { key: 'cancel_deadline', label: 'Cancellation deadline', desc: 'Users can cancel up to N hours before the slot', value: '24', type: 'number', on: true },
+        { key: 'duplicate', label: 'Prevent duplicate bookings', desc: 'Prevent the same user from booking the same slot twice', type: 'toggle', on: true },
+        { key: 'guest_limit', label: 'Guest limit per booking', desc: 'Maximum number of guests/seats per reservation', value: '6', type: 'number', on: true },
+      ];
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div><div class="page-title">Booking Rules</div>
+      <div class="page-subtitle">Configure policies and constraints for your resources</div></div>
+      <button class="btn btn-primary" onclick="showToast('Rules saved successfully!')">Save changes</button>
+    </div>
+    <div class="section">
+      <div class="card">
+        <div class="section-title">Policy Configuration</div>
+        ${rules.map(r => `
+        <div class="rule-row">
+          <div style="flex:1">
+            <div class="rule-label">${r.label}</div>
+            <div class="rule-desc">${r.desc}</div>
+          </div>
+          ${r.type === 'toggle' ? `
+          <div class="toggle ${r.on ? 'on' : ''}" onclick="this.classList.toggle('on');showToast('Policy updated')"></div>` : `
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <div class="toggle ${r.on ? 'on' : ''}" onclick="this.classList.toggle('on')"></div>
+            <input type="number" class="form-input" value="${r.value}" style="width:72px;text-align:center">
+          </div>`}
+        </div>`).join('')}
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── SETTINGS ─────────────────────────────────
+    function renderSettings() {
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div><div class="page-title">Settings</div>
+      <div class="page-subtitle">Manage your organization and platform settings</div></div>
+    </div>
+    <div class="section">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+        <div class="card">
+          <div class="section-title">Organization</div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="form-group">
+              <label class="form-label">Organization name</label>
+              <input class="form-input" value="Boş Yer Var MI ? Demo Org">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Business type</label>
+              <select class="form-select"><option>Education</option><option>Café / Restaurant</option><option>Coworking</option><option>Service</option><option>Other</option></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Timezone</label>
+              <select class="form-select"><option>Europe/Istanbul (GMT+3)</option><option>UTC</option><option>America/New_York</option></select>
+            </div>
+            <button class="btn btn-primary" onclick="showToast('Settings saved')">Save</button>
+          </div>
+        </div>
+        <div class="card">
+          <div class="section-title">Notifications</div>
+          <div style="display:flex;flex-direction:column;gap:0">
+            ${[
+          ['Email on new booking', 'Send email when someone makes a reservation', true],
+          ['SMS reminders', 'Send SMS reminder 24h before slot', false],
+          ['Waitlist promotions', 'Notify when someone joins or is promoted from waitlist', true],
+          ['Cancellation alerts', 'Alert admin when a booking is cancelled', true],
+        ].map(([l, d, on]) => `
+            <div class="rule-row">
+              <div style="flex:1"><div class="rule-label">${l}</div><div class="rule-desc">${d}</div></div>
+              <div class="toggle ${on ? 'on' : ''}" onclick="this.classList.toggle('on')"></div>
+            </div>`).join('')}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── PROFILE ──────────────────────────────────
+    function renderProfile() {
+      return `
+  <div class="fade-in">
+    <div class="page-header">
+      <div><div class="page-title">Profile</div>
+      <div class="page-subtitle">Manage your account</div></div>
+    </div>
+    <div class="section">
+      <div class="card" style="max-width:480px;margin:0 auto">
+        <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px">
+          <div class="avatar" style="width:64px;height:64px;font-size:1.4rem">${store.user?.name?.charAt(0) || '?'}</div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.15rem">${store.user?.name || 'Guest'}</div>
+            <div style="color:var(--text2);font-size:0.875rem">${store.user?.email || ''}</div>
+            <span class="badge confirmed mt-1">${store.user?.role || 'customer'}</span>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-top:16px">
+          <div class="form-group">
+            <label class="form-label">Full name</label>
+            <input class="form-input" value="${store.user?.name || ''}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input class="form-input" type="email" value="${store.user?.email || ''}">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Phone number</label>
+            <input class="form-input" placeholder="+90 555 000 0000">
+          </div>
+          <button class="btn btn-primary" onclick="showToast('Profile updated')">Save changes</button>
+          <button class="btn btn-danger" onclick="nav('landing')">Sign out</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+    }
+
+    // ─── MODAL ────────────────────────────────────
+    function renderModal() {
+      if (store.showModal === 'newResource') return `
+  <div class="modal-overlay" onclick="if(event.target===this){store.showModal=null;render()}">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Add new resource</div>
+        <button class="close-btn" onclick="store.showModal=null;render()">${icons.x}</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="form-group">
+          <label class="form-label">Resource name</label>
+          <input class="form-input" placeholder="e.g. Table #5, Python Beginners, Desk A3">
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select class="form-select">
+              <option>lesson</option><option>cafe</option><option>desk</option><option>room</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Capacity</label>
+            <input class="form-input" type="number" value="6" min="1">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Branch / Location</label>
+          <input class="form-input" placeholder="Main Campus">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Description</label>
+          <textarea class="form-textarea" placeholder="Brief description of this resource…"></textarea>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary w-full" style="justify-content:center" onclick="store.showModal=null;render()">Cancel</button>
+          <button class="btn btn-primary w-full" style="justify-content:center" onclick="store.showModal=null;showToast('Resource created successfully!');render()">
+            ${icons.plus} Create resource
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+      if (store.showModal === 'newSlot') return `
+  <div class="modal-overlay" onclick="if(event.target===this){store.showModal=null;render()}">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Create time slot</div>
+        <button class="close-btn" onclick="store.showModal=null;render()">${icons.x}</button>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div class="form-group">
+          <label class="form-label">Resource</label>
+          <select class="form-select">
+            ${store.resources.map(r => `<option>${r.name}</option>`).join('')}
+          </select>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Start time</label>
+            <input class="form-input" type="time" value="09:00">
+          </div>
+          <div class="form-group">
+            <label class="form-label">End time</label>
+            <input class="form-input" type="time" value="10:00">
+          </div>
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label class="form-label">Capacity override</label>
+            <input class="form-input" type="number" placeholder="Use resource default">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Repeat</label>
+            <select class="form-select">
+              <option>No repeat</option>
+              <option>Daily</option>
+              <option>Weekdays</option>
+              <option>Weekly</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;gap:10px">
+          <button class="btn btn-secondary w-full" style="justify-content:center" onclick="store.showModal=null;render()">Cancel</button>
+          <button class="btn btn-primary w-full" style="justify-content:center" onclick="store.showModal=null;showToast('Slot created!');render()">
+            ${icons.plus} Create slot
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+
+      return '';
+    }
+
+    // ─── INTERACTIONS ─────────────────────────────
+    function nav(view) { store.currentView = view; store.mobileDrawerOpen = false; render(); window.scrollTo(0, 0); }
+    function closeDrawer() { store.mobileDrawerOpen = false; render(); }
+    function openBooking(resourceId) { store.bookingResourceId = resourceId; store.bookingStep = 1; store.selectedSlot = null; nav('booking'); }
+    function selectDate(ts) { store.selectedDate = new Date(ts); render(); }
+    function selectSlot(id) { store.selectedSlot = id; render(); }
+    function confirmBooking() {
+      store.bookingStep = 1; store.selectedSlot = null;
+      nav('my-bookings');
+      showToast('Reservation confirmed! 🎉');
+    }
+    function confirmRes(id) {
+      const r = store.reservations.find(r => r.id === id);
+      if (r) { r.status = 'confirmed'; render(); showToast('Reservation confirmed'); }
+    }
+    function cancelRes(id) {
+      const r = store.reservations.find(r => r.id === id);
+      if (r) { r.status = 'cancelled'; render(); showToast('Reservation cancelled', 'info'); }
+    }
+    function filterResources(q) {
+      const grid = document.getElementById('resourceGrid');
+      if (!grid) return;
+      const lq = q.toLowerCase();
+      const filtered = q ? store.resources.filter(r => r.name.toLowerCase().includes(lq) || r.type.includes(lq) || r.branch.toLowerCase().includes(lq)) : store.resources;
+      grid.innerHTML = renderResourceCards(filtered);
+    }
+    function filterByType(type) {
+      document.querySelectorAll('[data-filter]').forEach(b => {
+        b.classList.remove('btn-primary'); b.classList.add('btn-secondary');
+        if (b.dataset.filter === type) { b.classList.add('btn-primary'); b.classList.remove('btn-secondary'); }
+      });
+      const grid = document.getElementById('resourceGrid');
+      if (!grid) return;
+      const filtered = type === 'all' ? store.resources : store.resources.filter(r => r.type === type);
+      grid.innerHTML = renderResourceCards(filtered);
+    }
+
+    function bindAll() {
+      const menuBtn = document.getElementById('menuBtn');
+      if (menuBtn) menuBtn.addEventListener('click', () => { store.mobileDrawerOpen = !store.mobileDrawerOpen; render(); });
+    }
+
+    // ─── INIT ─────────────────────────────────────
+    render();
+  </script>
+</body>
+
+</html>
