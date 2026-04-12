@@ -1,4 +1,4 @@
-# Remotely — Flexible Reservation & Capacity Management Platform
+# BosYerVarMi — Flexible Reservation & Capacity Management Platform
 
 A production-grade, mobile-friendly platform for managing resources, slots, and bookings across various industries. Built with a generic architecture to support lessons, cafes, coworking spaces, and more.
 
