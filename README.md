@@ -35,14 +35,14 @@ A production-grade, mobile-friendly platform for managing resources, slots, and 
    ```
 3. Set up environment variables (`apps/server/.env`):
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/remotely"
+   DATABASE_URL="postgresql://user:password@localhost:5432/bosyervarmi"
    JWT_SECRET="your-secret"
    CLIENT_URL="http://localhost:5173"
    ```
 4. Initialize the database:
    ```bash
-   npm run prisma:migrate --workspace=@remotely/server
-   npm run seed --workspace=@remotely/server
+   npm run prisma:migrate --workspace=@bosyervarmi/server
+   npm run seed --workspace=@bosyervarmi/server
    ```
 5. Run development server:
    ```bash
