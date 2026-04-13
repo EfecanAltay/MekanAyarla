@@ -3,6 +3,7 @@ import { z } from 'zod';
 export const ResourceTypeSchema = z.object({
   name: z.string().min(2),
   description: z.string().optional(),
+  category: z.string().default('other'),
   config: z.record(z.any()).optional(),
 });
 
@@ -16,6 +17,7 @@ export const ResourceSchema = z.object({
   startTime: z.string().optional(),
   endTime: z.string().optional(),
   slotDuration: z.number().int().positive().optional(),
+  requiresApproval: z.boolean().default(false),
   active: z.boolean().default(true),
   branchId: z.string(),
   offDays: z.array(z.number()).optional(),

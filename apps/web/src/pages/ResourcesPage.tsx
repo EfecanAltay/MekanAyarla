@@ -4,6 +4,7 @@ import { Plus, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { fetchApi } from '../lib/api';
+import { CategoryIcon } from '../lib/icons';
 
 export default function ResourcesPage() {
   const { t } = useTranslation();
@@ -25,6 +26,7 @@ export default function ResourcesPage() {
     startTime: '09:00',
     endTime: '18:00',
     slotDuration: 60,
+    requiresApproval: false,
     offDays: [] as number[],
     offHours: [] as string[]
   });
@@ -64,7 +66,9 @@ export default function ResourcesPage() {
       name: '', description: '', capacity: 1,
       branchId: metadata.branches?.[0]?.id || '',
       typeId: metadata.resourceTypes?.[0]?.id || '',
-      startDate: '', endDate: '', startTime: '09:00', endTime: '18:00', slotDuration: 60, offDays: [], offHours: []
+      startDate: '', endDate: '', startTime: '09:00', endTime: '18:00', slotDuration: 60, 
+      requiresApproval: false,
+      offDays: [], offHours: []
     });
     setIsModalOpen(true);
   };
@@ -83,6 +87,7 @@ export default function ResourcesPage() {
       startTime: resource.startTime || '09:00',
       endTime: resource.endTime || '18:00',
       slotDuration: resource.slotDuration || 60,
+      requiresApproval: resource.requiresApproval || false,
       offDays: resource.offDays || [],
       offHours: resource.offHours || []
     });
@@ -129,13 +134,8 @@ export default function ResourcesPage() {
     return 'bg-success';
   };
 
-  const getTypeIcon = (type: string) => {
-    const typeLower = type?.toLowerCase();
-    if (typeLower?.includes('lesson')) return '📚';
-    if (typeLower?.includes('cafe') || typeLower?.includes('table')) return '☕';
-    if (typeLower?.includes('desk')) return '💻';
-    if (typeLower?.includes('room')) return '🏢';
-    return '📦';
+  const getTypeIcon = (resource: any) => {
+    return <CategoryIcon category={resource.type?.category} size={16} />;
   };
 
   return (
@@ -169,9 +169,9 @@ export default function ResourcesPage() {
                 <tr key={r.id} className="hover:bg-white/5 transition-colors group">
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-2">
-                      <span className="text-xl w-8 h-8 rounded-lg bg-secondary flex items-center justify-center shrink-0">
-                        {getTypeIcon(r.type?.name)}
-                      </span>
+                      <div className="shrink-0">
+                        {getTypeIcon(r)}
+                      </div>
                       <div>
                         <div className="font-medium text-foreground tracking-tight">{r.name}</div>
                         <div className="text-[0.7rem] text-muted-foreground mt-0.5 line-clamp-1">{r.description || '--'}</div>
@@ -196,9 +196,16 @@ export default function ResourcesPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3.5">
-                    <span className={`px-2.5 py-0.5 text-[0.65rem] font-bold tracking-wider uppercase rounded-full ${r.active ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground border border-border'}`}>
-                      {r.active ? 'Active' : 'Inactive'}
-                    </span>
+                    <div className="flex flex-col gap-1.5 items-start">
+                      <span className={`px-2.5 py-0.5 text-[0.65rem] font-bold tracking-wider uppercase rounded-full ${r.active ? 'bg-success/15 text-success' : 'bg-muted text-muted-foreground border border-border'}`}>
+                        {r.active ? 'Active' : 'Inactive'}
+                      </span>
+                      {r.requiresApproval && (
+                        <span className="px-2 py-0.5 text-[0.6rem] font-bold uppercase rounded-md bg-warning/10 text-warning border border-warning/20">
+                          {t('admin.requires_approval')}
+                        </span>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -289,6 +296,20 @@ export default function ResourcesPage() {
                     <option key={b.id} value={b.id}>{b.name}</option>
                   ))}
                 </select>
+              </div>
+
+              <div className="flex items-center justify-between p-3.5 bg-secondary/30 border border-border rounded-xl">
+                <div>
+                  <label className="text-sm font-bold text-foreground block">{t('admin.requires_approval')}</label>
+                  <p className="text-[0.65rem] text-muted-foreground mt-0.5">Randevular bu kaynak için admin onayına düşer.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, requiresApproval: !formData.requiresApproval })}
+                  className={`w-10 h-5 rounded-full transition-all relative shrink-0 ${formData.requiresApproval ? 'bg-primary shadow-[0_0_12px_rgba(108,99,255,0.4)]' : 'bg-secondary border border-border'}`}
+                >
+                  <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${formData.requiresApproval ? 'left-5.5' : 'left-0.5'}`} />
+                </button>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

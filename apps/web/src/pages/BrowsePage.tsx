@@ -2,8 +2,10 @@ import { useState, useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchApi } from '../lib/api';
 import { Search, MapPin, ArrowRight, Check } from 'lucide-react';
+import { CATEGORY_MAP, CategoryIcon } from '../lib/icons';
 import { Button } from '../components/ui/button';
 import { generateDays, generateSlots } from '../lib/slotutils';
+import { ResourceCategory } from '@mekanayarla/shared';
 
 export default function BrowsePage() {
   const { t } = useTranslation();
@@ -15,18 +17,13 @@ export default function BrowsePage() {
     fetchApi('/resources').then(res => setResources(res.resources || []));
   }, []);
 
-  const getTypeIcon = (type: string) => {
-    const typeLower = type?.toLowerCase() || '';
-    if (typeLower.includes('lesson')) return { icon: '📚', color: 'bg-primary/20 text-accent2' };
-    if (typeLower.includes('cafe')) return { icon: '☕', color: 'bg-warning/15 text-warning' };
-    if (typeLower.includes('desk')) return { icon: '💻', color: 'bg-accent3/15 text-accent3' };
-    if (typeLower.includes('room')) return { icon: '🏢', color: 'bg-success/15 text-success' };
-    return { icon: '📦', color: 'bg-muted text-muted-foreground' };
+  const getTypeIcon = (resource: any) => {
+    return <CategoryIcon category={resource.type?.category} size={20} />;
   };
 
   const filteredResources = activeFilter === 'all'
     ? resources
-    : resources.filter(r => r.type?.name?.toLowerCase().includes(activeFilter));
+    : resources.filter(r => r.type?.category === activeFilter);
 
   if (bookingResource) {
     return <BookingFlow resourceId={bookingResource.id} onBack={() => setBookingResource(null)} />;
@@ -51,23 +48,32 @@ export default function BrowsePage() {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        {['Tümü', 'Dersler', 'Kafeler', 'Masalar', 'Odalar'].map(f => (
+        <button
+          onClick={() => setActiveFilter('all')}
+          className={`px-3.5 py-1.5 rounded-md text-sm font-medium transition-all ${activeFilter === 'all'
+            ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
+            : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80 border border-border'
+            }`}
+        >
+          {t('admin.ph_search_reservation') ? 'Tüm Tipler' : 'All Types'}
+        </button>
+        {Object.values(ResourceCategory).filter(c => c !== 'other').map(cat => (
           <button
-            key={f}
-            onClick={() => setActiveFilter(f.toLowerCase())}
-            className={`px-3.5 py-1.5 rounded-md text-sm font-medium transition-all ${activeFilter === f.toLowerCase()
+            key={cat}
+            onClick={() => setActiveFilter(cat)}
+            className={`px-3.5 py-1.5 rounded-md text-sm font-medium transition-all flex items-center gap-2 ${activeFilter === cat
               ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
               : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80 border border-border'
               }`}
           >
-            {f === 'Tümü' ? 'Tüm Tipler' : f}
+            <CategoryIcon category={cat} size={14} showBackground={false} />
+            {CATEGORY_MAP[cat as ResourceCategory].label.split(' / ')[0]}
           </button>
         ))}
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredResources.map((r) => {
-          const { icon, color } = getTypeIcon(r.type?.name);
           const pct = Math.min((0 / r.capacity) * 100, 100);
 
           return (
@@ -77,13 +83,13 @@ export default function BrowsePage() {
               className="bg-card border border-border rounded-xl overflow-hidden hover:border-primary hover:-translate-y-1 hover:shadow-[0_8px_32px_rgba(108,99,255,0.15)] transition-all cursor-pointer flex flex-col"
             >
               <div className="p-5 flex items-start gap-3.5 border-b border-border/50">
-                <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 ${color.split(' ')[0]}`}>
-                  {icon}
+                <div className="shrink-0">
+                  {getTypeIcon(r)}
                 </div>
                 <div>
                   <div className="font-display font-bold text-base leading-tight mb-1">{r.name}</div>
-                  <span className={`text-[0.65rem] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full ${color}`}>
-                    {r.type?.name || 'Resource'}
+                  <span className="text-[0.65rem] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full bg-primary/15 text-primary">
+                    {r.type?.name || 'Hizmet'}
                   </span>
                 </div>
               </div>
@@ -340,7 +346,7 @@ function BookingFlow({ resourceId, onBack }: { resourceId: string; onBack: () =>
             <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('booking.notes')}</label>
             <textarea
               className="resize-y min-h-[80px] bg-secondary/50 border border-border rounded-xl p-3 text-[0.9rem] text-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-sm"
-              placeholder={t('booking.ph_notes')}
+              placeholder={t('bookings.ph_notes')}
               value={bookingNotes}
               onChange={(e) => setBookingNotes(e.target.value)}
             />

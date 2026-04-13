@@ -22,6 +22,18 @@ export const WaitlistStatus = {
 } as const;
 export type WaitlistStatus = (typeof WaitlistStatus)[keyof typeof WaitlistStatus];
 
+export const ResourceCategory = {
+  LESSON: 'lesson',
+  THEATER: 'theater',
+  DRIVING: 'driving',
+  ONLINE: 'online',
+  CAFE: 'cafe',
+  TABLE: 'table',
+  ROOM: 'room',
+  OTHER: 'other',
+} as const;
+export type ResourceCategory = (typeof ResourceCategory)[keyof typeof ResourceCategory];
+
 export interface User {
   id: string;
   email: string;

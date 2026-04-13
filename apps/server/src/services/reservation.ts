@@ -50,7 +50,9 @@ export const createReservation = async (input: CreateReservationInput) => {
         timeSlotId: input.timeSlotId,
         notes: input.notes,
         metadata: input.metadata,
-        status: ReservationStatus.CONFIRMED, // Or PENDING if approval is needed
+        status: (slot.resource as any).requiresApproval
+          ? ReservationStatus.PENDING
+          : ReservationStatus.CONFIRMED,
       },
     });
   });

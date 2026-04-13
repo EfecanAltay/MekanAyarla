@@ -67,6 +67,7 @@ model ResourceType {
   id             String         @id @default(uuid())
   name           String
   description    String?
+  category       String         @default("other")
   organizationId String
   organization   Organization   @relation(fields: [organizationId], references: [id])
   resources      Resource[]
@@ -88,6 +89,7 @@ model Resource {
   startTime      String?
   endTime        String?
   slotDuration   Int?
+  requiresApproval Boolean        @default(false)
   active         Boolean        @default(true)
   offDays        Int[]          @default([])
   offHours       String[]       @default([])

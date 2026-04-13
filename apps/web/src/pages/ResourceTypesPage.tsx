@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, X, Tag } from 'lucide-react';
+import { Plus, X } from 'lucide-react';
+import { cn } from '../lib/utils';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { fetchApi } from '../lib/api';
+import { ResourceCategory } from '@mekanayarla/shared';
+import { CategoryIcon, CATEGORY_MAP } from '../lib/icons';
 
 export default function ResourceTypesPage() {
   const { t } = useTranslation();
@@ -16,7 +19,8 @@ export default function ResourceTypesPage() {
   const [formData, setFormData] = useState({
     id: '',
     name: '',
-    description: ''
+    description: '',
+    category: ResourceCategory.OTHER as string
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,13 +41,18 @@ export default function ResourceTypesPage() {
 
   const openCreateModal = () => {
     setIsEditing(false);
-    setFormData({ id: '', name: '', description: '' });
+    setFormData({ id: '', name: '', description: '', category: ResourceCategory.OTHER });
     setIsModalOpen(true);
   };
 
   const openEditModal = (type: any) => {
     setIsEditing(true);
-    setFormData({ id: type.id, name: type.name, description: type.description || '' });
+    setFormData({ 
+      id: type.id, 
+      name: type.name, 
+      description: type.description || '',
+      category: type.category || ResourceCategory.OTHER
+    });
     setIsModalOpen(true);
   };
 
@@ -54,12 +63,20 @@ export default function ResourceTypesPage() {
       if (isEditing) {
         await fetchApi(`/resource-types/${formData.id}`, {
           method: 'PATCH',
-          body: JSON.stringify({ name: formData.name, description: formData.description })
+          body: JSON.stringify({ 
+            name: formData.name, 
+            description: formData.description,
+            category: formData.category
+          })
         });
       } else {
         await fetchApi('/resource-types', {
           method: 'POST',
-          body: JSON.stringify({ name: formData.name, description: formData.description })
+          body: JSON.stringify({ 
+            name: formData.name, 
+            description: formData.description,
+            category: formData.category
+          })
         });
       }
       setIsModalOpen(false);
@@ -110,8 +127,8 @@ export default function ResourceTypesPage() {
               {!isLoading && resourceTypes.map((tItem: any) => (
                 <tr key={tItem.id} className="hover:bg-white/5 transition-colors group">
                   <td className="px-4 py-3.5">
-                    <div className="flex items-center gap-2">
-                      <Tag className="w-4 h-4 text-primary opacity-70" />
+                    <div className="flex items-center gap-3">
+                      <CategoryIcon category={tItem.category} size={16} />
                       <span className="font-medium text-foreground tracking-tight">{tItem.name}</span>
                     </div>
                   </td>
@@ -185,6 +202,28 @@ export default function ResourceTypesPage() {
                   placeholder={t('admin.ph_description')}
                   rows={3}
                 />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('admin.category') || 'Category'}</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {Object.values(ResourceCategory).map((cat) => (
+                    <button
+                      key={cat}
+                      type="button"
+                      onClick={() => setFormData({ ...formData, category: cat })}
+                      className={cn(
+                        "flex items-center gap-2 px-3 py-2 rounded-lg border text-left transition-all",
+                        formData.category === cat 
+                          ? "bg-primary/10 border-primary text-primary" 
+                          : "bg-secondary/50 border-border text-muted-foreground hover:border-primary/50"
+                      )}
+                    >
+                      <CategoryIcon category={cat} size={14} showBackground={false} className="shrink-0" />
+                      <span className="text-[0.75rem] font-medium leading-none">{CATEGORY_MAP[cat].label}</span>
+                    </button>
+                  ))}
+                </div>
               </div>
 
               <div className="flex justify-end pt-4 gap-3 mt-2 border-t border-border/50">
