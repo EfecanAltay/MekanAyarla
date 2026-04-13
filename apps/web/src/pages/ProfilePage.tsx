@@ -1,13 +1,11 @@
 import { useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { Shield, Trash2, Key, Info, User as UserIcon } from 'lucide-react';
+import { Shield, Trash2, Info } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { fetchApi } from '../lib/api';
 import { useAuthStore } from '../store/useAuthStore';
 
 export default function ProfilePage() {
-  const { t } = useTranslation();
   const { user, logout } = useAuthStore();
   
   // Password Change State

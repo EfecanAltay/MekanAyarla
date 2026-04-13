@@ -4,7 +4,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = "postgresql://postgres:postgres@localhost:5433/makanayarla?schema=public"
+  url      = "postgresql://postgres:postgres@localhost:5433/mekanayarla?schema=public"
 }
 
 enum UserRole {

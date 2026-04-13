@@ -12,11 +12,9 @@ export default function SchedulePage() {
   const [resourceDetails, setResourceDetails] = useState<any>(null);
 
   const [activeDate, setActiveDate] = useState<Date>(new Date());
-  const [activeView, setActiveView] = useState('Week view');
 
   // Multi-selection states
   const [selectedSlotIds, setSelectedSlotIds] = useState<string[]>([]);
-  const [isBatchMode, setIsBatchMode] = useState(false);
 
   // Modal states for toggling
   const [isNoteModalOpen, setIsNoteModalOpen] = useState(false);

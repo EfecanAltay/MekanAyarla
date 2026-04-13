@@ -58,6 +58,7 @@ export const register = async (req: Request, res: Response) => {
         name: user.name,
         role: user.role,
         organizationId: user.organizationId,
+        organizationName: validatedData.organizationName,
       },
     });
   } catch (error: any) {
@@ -71,6 +72,7 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await prisma.user.findUnique({
       where: { email: validatedData.email },
+      include: { organization: true },
     });
 
     if (!user || !(await bcrypt.compare(validatedData.password, user.password))) {
@@ -96,6 +98,7 @@ export const login = async (req: Request, res: Response) => {
         name: user.name,
         role: user.role,
         organizationId: user.organizationId,
+        organizationName: user.organization?.name,
       },
     });
   } catch (error: any) {
@@ -111,9 +114,21 @@ export const logout = (req: Request, res: Response) => {
 export const me = async (req: any, res: Response) => {
   const user = await prisma.user.findUnique({
     where: { id: req.user.userId },
-    select: { id: true, email: true, name: true, role: true, organizationId: true },
+    include: { organization: { select: { name: true } } },
   });
-  res.json({ user });
+  
+  if (!user) return res.status(404).json({ message: 'User not found' });
+
+  res.json({
+    user: {
+      id: user.id,
+      email: user.email,
+      name: user.name,
+      role: user.role,
+      organizationId: user.organizationId,
+      organizationName: user.organization?.name,
+    }
+  });
 };
 
 export const changePassword = async (req: any, res: Response) => {

@@ -52,7 +52,7 @@ export function AppLayout() {
         >
           <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Mekan Ayarla</span>
           <span className="block text-muted-foreground font-normal text-xs tracking-wider uppercase mt-[-2px]">
-            {isAdmin ? 'Admin' : 'Platform'}
+            {isAdmin ? (user?.organizationName || 'Yönetim') : 'Mekan Seç Hemen Ayarla'}
           </span>
         </div>
         <div className="flex-1" />
