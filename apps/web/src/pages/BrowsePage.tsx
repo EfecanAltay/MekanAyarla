@@ -37,7 +37,7 @@ export default function BrowsePage() {
       <div className="flex justify-between items-start gap-4 mb-6 pt-2">
         <div>
           <h1 className="font-display text-3xl font-extrabold tracking-tight mb-1">{t('nav.explore')}</h1>
-          <p className="text-sm text-muted-foreground">Find and book available resources</p>
+          <p className="text-sm text-muted-foreground">{t('bookings.find_and_book')}</p>
         </div>
       </div>
 
@@ -51,7 +51,7 @@ export default function BrowsePage() {
       </div>
 
       <div className="flex flex-wrap gap-2 mb-6">
-        {['All', 'Lesson', 'Cafe', 'Desk', 'Room'].map(f => (
+        {['Tümü', 'Dersler', 'Kafeler', 'Masalar', 'Odalar'].map(f => (
           <button
             key={f}
             onClick={() => setActiveFilter(f.toLowerCase())}
@@ -60,7 +60,7 @@ export default function BrowsePage() {
               : 'bg-secondary text-muted-foreground hover:text-foreground hover:bg-secondary/80 border border-border'
               }`}
           >
-            {f === 'All' ? 'All types' : f}
+            {f === 'Tümü' ? 'Tüm Tipler' : f}
           </button>
         ))}
       </div>

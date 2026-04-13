@@ -88,7 +88,10 @@
     "empty_desc": "Henüz bir rezervasyon yapmadınız. Size uygun bir şeyler bulmak için keşfet sayfasına göz atın!",
     "discover": "Hizmetlerı Keşfet",
     "cancel_confirm": "Bu rezervasyonu iptal etmek istediğinize emin misiniz?",
-    "cancelled_label": "Rezervasyon İptal Edildi"
+    "cancelled_label": "Rezervasyon İptal Edildi",
+    "ph_notes": "Özel notlar (opsiyonel)",
+    "ph_search_reservation": "Rezervasyon ara...",
+    "find_and_book": "Mevcut Hizmetlerı Bul ve Rezerve Et"
   },
   "admin": {
     "resources_title": "Hizmetler",

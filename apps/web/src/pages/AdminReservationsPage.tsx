@@ -68,17 +68,17 @@ export default function AdminReservationsPage() {
           />
         </div>
         <select className="h-10 bg-secondary/50 border border-border rounded-md px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer w-full sm:w-auto">
-          <option>All statuses</option>
-          <option>Confirmed</option>
-          <option>Pending</option>
-          <option>Cancelled</option>
+          <option>Tüm Durumlar</option>
+          <option>Onaylandı</option>
+          <option>Beklemede</option>
+          <option>İptal Edildi</option>
         </select>
         <select className="h-10 bg-secondary/50 border border-border rounded-md px-3 text-sm focus:border-primary focus:ring-1 focus:ring-primary appearance-none cursor-pointer w-full sm:w-auto">
-          <option>All types</option>
-          <option>Lesson</option>
-          <option>Café</option>
-          <option>Desk</option>
-          <option>Room</option>
+          <option>Tüm Tipler</option>
+          <option>Dersler</option>
+          <option>Kafeler</option>
+          <option>Masalar</option>
+          <option>Odalar</option>
         </select>
       </div>
 

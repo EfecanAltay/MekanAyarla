@@ -87,7 +87,10 @@
     "empty_desc": "You haven't made any reservations yet. Head over to the explore page to find something!",
     "discover": "Discover Resources",
     "cancel_confirm": "Are you sure you want to cancel this booking?",
-    "cancelled_label": "Booking Cancelled"
+    "cancelled_label": "Booking Cancelled",
+    "ph_notes": "Special notes (optional)",
+    "ph_search_reservation": "Search reservation...",
+    "find_and_book": "Find and book available resources"
   },
   "admin": {
     "resources_title": "Resources",
