@@ -30,6 +30,8 @@ export const ResourceCategory = {
   CAFE: 'cafe',
   TABLE: 'table',
   ROOM: 'room',
+  GYM: 'gym',
+  TRANSPORT: 'transport',
   OTHER: 'other',
 } as const;
 export type ResourceCategory = (typeof ResourceCategory)[keyof typeof ResourceCategory];

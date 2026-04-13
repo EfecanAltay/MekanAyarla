@@ -7,7 +7,9 @@ import {
   Layout,
   DoorOpen,
   Tag,
-  type LucideIcon
+  type LucideIcon,
+  Bus,
+  Dumbbell
 } from 'lucide-react';
 import { ResourceCategory } from '@mekanayarla/shared';
 import { cn } from './utils';
@@ -53,6 +55,16 @@ export const CATEGORY_MAP: Record<ResourceCategory, CategoryInfo> = {
     icon: DoorOpen,
     label: 'Oda / Salon',
     color: 'bg-success/15 text-success'
+  },
+  [ResourceCategory.GYM]: {
+    icon: Dumbbell,
+    label: 'Spor Salonu',
+    color: 'bg-accent4/15 text-accent4'
+  },
+  [ResourceCategory.TRANSPORT]: {
+    icon: Bus,
+    label: 'Ulaşım',
+    color: 'bg-blue-500/15 text-blue-400'
   },
   [ResourceCategory.OTHER]: {
     icon: Tag,
