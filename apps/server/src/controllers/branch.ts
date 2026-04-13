@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
-import { BranchSchema } from '@remotely/shared';
+import { BranchSchema } from '@mekanayarla/shared';
 
 // Get all branches for the user's organization
 export const getBranches = async (req: AuthRequest, res: Response) => {
@@ -31,7 +31,7 @@ export const createBranch = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+
     if (!user || !user.organizationId || !['BUSINESS_ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
       throw new Error('Unauthorized');
     }
@@ -56,7 +56,7 @@ export const updateBranch = async (req: AuthRequest, res: Response) => {
   try {
     const branchId = req.params.id;
     const userId = req.user?.userId;
-    
+
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.organizationId || !['BUSINESS_ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
       throw new Error('Unauthorized');
@@ -86,7 +86,7 @@ export const deleteBranch = async (req: AuthRequest, res: Response) => {
   try {
     const branchId = req.params.id;
     const userId = req.user?.userId;
-    
+
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.organizationId || !['BUSINESS_ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
       throw new Error('Unauthorized');

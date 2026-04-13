@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { User } from '@remotely/shared';
+import type { User } from '@mekanayarla/shared';
 import { fetchApi } from '../lib/api';
 
 interface AuthState {

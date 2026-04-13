@@ -50,7 +50,7 @@ export function AppLayout() {
           className="font-display font-extrabold text-xl tracking-tight cursor-pointer shrink-0"
           onClick={() => navigate('/')}
         >
-          <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Boş Yer Var MI ?</span>
+          <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Mekan Ayarla</span>
           <span className="block text-muted-foreground font-normal text-xs tracking-wider uppercase mt-[-2px]">
             {isAdmin ? 'Admin' : 'Platform'}
           </span>
@@ -146,7 +146,7 @@ export function AppLayout() {
       )}>
         <div className="flex items-center justify-between mb-4 pb-4 border-b border-border">
           <div className="font-display font-extrabold text-xl tracking-tight">
-            <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Boş Yer Var MI ?</span>
+            <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Mekan Ayarla</span>
           </div>
           <button className="p-1 rounded-md text-muted-foreground hover:bg-secondary hover:text-foreground" onClick={() => setMobileDrawerOpen(false)}>
             <X className="h-5 w-5" />

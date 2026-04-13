@@ -1,5 +1,5 @@
 import { prisma } from '../lib/prisma';
-import { CreateReservationInput, ReservationStatus } from '@remotely/shared';
+import { CreateReservationInput, ReservationStatus } from '@mekanayarla/shared';
 
 /**
  * Creates a reservation ensuring that capacity limits are respected.
@@ -11,7 +11,7 @@ export const createReservation = async (input: CreateReservationInput) => {
     // We use a raw query because Prisma's interactive transactions don't natively support FOR UPDATE on a findUnique easily without raw.
     // However, we can also use a 'count' check followed by 'create' in a REPEATABLE READ transaction.
     // For maximum safety, we'll use a raw query to lock the slot row.
-    
+
     await tx.$executeRaw`SELECT id FROM "TimeSlot" WHERE id = ${input.timeSlotId} FOR UPDATE`;
 
     // 2. Clear stale reservations (optional but good for consistency)

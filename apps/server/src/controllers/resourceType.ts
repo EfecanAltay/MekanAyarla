@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import { prisma } from '../lib/prisma';
-import { ResourceTypeSchema } from '@remotely/shared';
+import { ResourceTypeSchema } from '@mekanayarla/shared';
 
 // Get all resource types for the user's organization
 export const getResourceTypes = async (req: AuthRequest, res: Response) => {
@@ -31,7 +31,7 @@ export const createResourceType = async (req: AuthRequest, res: Response) => {
   try {
     const userId = req.user?.userId;
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+
     if (!user || !user.organizationId || !['BUSINESS_ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
       throw new Error('Unauthorized');
     }
@@ -56,7 +56,7 @@ export const updateResourceType = async (req: AuthRequest, res: Response) => {
   try {
     const typeId = req.params.id;
     const userId = req.user?.userId;
-    
+
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.organizationId || !['BUSINESS_ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
       throw new Error('Unauthorized');
@@ -86,7 +86,7 @@ export const deleteResourceType = async (req: AuthRequest, res: Response) => {
   try {
     const typeId = req.params.id;
     const userId = req.user?.userId;
-    
+
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user || !user.organizationId || !['BUSINESS_ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
       throw new Error('Unauthorized');

@@ -36,7 +36,7 @@ export default function LoginPage() {
       <div className="w-full max-w-[400px] mb-12 fade-in">
         <div className="text-center mb-8">
           <div className="font-display font-extrabold text-3xl tracking-tight mb-2">
-            <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Boş Yer Var Mı ?</span>
+            <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Mekan Ayarla</span>
           </div>
           <p className="text-[0.875rem] text-muted-foreground">{t('auth.login_title')}</p>
         </div>

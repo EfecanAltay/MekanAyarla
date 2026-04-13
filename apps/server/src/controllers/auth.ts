@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { prisma } from '../lib/prisma';
-import { LoginSchema, RegisterSchema, ChangePasswordSchema } from '@remotely/shared';
+import { LoginSchema, RegisterSchema, ChangePasswordSchema } from '@mekanayarla/shared';
 
 export const register = async (req: Request, res: Response) => {
   try {

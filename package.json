@@ -1,5 +1,5 @@
 {
-  "name": "remotely",
+  "name": "mekanayarla",
   "private": true,
   "workspaces": [
     "apps/*",

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { prisma } from '../lib/prisma';
 import { AuthRequest } from '../middleware/auth';
-import { ResourceSchema, TimeSlotSchema, ToggleSlotSchema, BatchToggleSlotSchema } from '@remotely/shared';
+import { ResourceSchema, TimeSlotSchema, ToggleSlotSchema, BatchToggleSlotSchema } from '@mekanayarla/shared';
 
 export const getResources = async (req: Request, res: Response) => {
   try {
@@ -268,7 +268,7 @@ export const batchToggleSlots = async (req: AuthRequest, res: Response) => {
         if (!s.startTime || !s.endTime) continue;
 
         const startTimeDate = new Date(s.startTime);
-        
+
         // Check if DB slot exists by time
         const existing = await prisma.timeSlot.findFirst({
           where: { resourceId, startTime: startTimeDate }

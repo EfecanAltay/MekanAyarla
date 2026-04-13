@@ -1,4 +1,4 @@
-# BosYerVarMi — Flexible Reservation & Capacity Management Platform
+# MekanAyarla — Flexible Reservation & Capacity Management Platform
 
 A production-grade, mobile-friendly platform for managing resources, slots, and bookings across various industries. Built with a generic architecture to support lessons, cafes, coworking spaces, and more.
 
@@ -35,14 +35,14 @@ A production-grade, mobile-friendly platform for managing resources, slots, and 
    ```
 3. Set up environment variables (`apps/server/.env`):
    ```env
-   DATABASE_URL="postgresql://user:password@localhost:5432/bosyervarmi"
+   DATABASE_URL="postgresql://user:password@localhost:5432/MekanAyarla"
    JWT_SECRET="your-secret"
    CLIENT_URL="http://localhost:5173"
    ```
 4. Initialize the database:
    ```bash
-   npm run prisma:migrate --workspace=@bosyervarmi/server
-   npm run seed --workspace=@bosyervarmi/server
+   npm run prisma:migrate --workspace=@MekanAyarla/server
+   npm run seed --workspace=@MekanAyarla/server
    ```
 5. Run development server:
    ```bash

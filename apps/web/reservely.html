@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Boş Yer Var MI ? — Flexible Reservation Platform</title>
+  <title>Mekan Ayarla — Flexible Reservation Platform</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link
     href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap"
@@ -1954,7 +1954,7 @@
       return `
   <div class="landing">
     <div class="topbar">
-      <div class="topbar-logo">Boş Yer Var MI ? <span>Platform</span></div>
+      <div class="topbar-logo">Mekan Ayarla ? <span>Platform</span></div>
       <div class="topbar-spacer"></div>
       <button class="btn btn-ghost btn-sm" onclick="nav('login')">Sign in</button>
       <button class="btn btn-primary btn-sm" onclick="nav('register')">Get started</button>
@@ -2005,7 +2005,7 @@
       </div>
     </div>
     <div style="text-align:center;padding:32px 24px 60px;color:var(--text3);font-size:0.8rem">
-      © 2026 BosYerVarMi.com • Built with ♥ for multi-tenant SaaS
+      © 2026 MekanAyarla.com • Built with ♥ for multi-tenant SaaS
     </div>
   </div>`;
     }
@@ -2097,7 +2097,7 @@
       return `
   <div class="topbar">
     <button class="mobile-menu-btn" id="menuBtn" style="display:flex">${icons.menu}</button>
-    <div class="topbar-logo">Boş Yer Var MI ? <span>${store.isAdmin ? 'Admin' : 'Platform'}</span></div>
+    <div class="topbar-logo">Mekan Ayarla ? <span>${store.isAdmin ? 'Admin' : 'Platform'}</span></div>
     <div class="topbar-spacer"></div>
     ${!store.isAdmin ? `
     <nav class="topbar-nav">
@@ -2160,7 +2160,7 @@
   <div class="mobile-overlay" id="drawerOverlay" onclick="closeDrawer()" style="display:${store.mobileDrawerOpen ? 'block' : 'none'}"></div>
   <div class="mobile-drawer ${store.mobileDrawerOpen ? 'open' : ''}" id="mobileDrawer">
     <div class="drawer-header">
-      <div class="topbar-logo">Boş Yer Var MI ?</div>
+      <div class="topbar-logo">Mekan Ayarla ?</div>
       <button class="close-btn" onclick="closeDrawer()">${icons.x}</button>
     </div>
     ${items.map(it => `
@@ -2835,7 +2835,7 @@
           <div style="display:flex;flex-direction:column;gap:14px">
             <div class="form-group">
               <label class="form-label">Organization name</label>
-              <input class="form-input" value="Boş Yer Var MI ? Demo Org">
+              <input class="form-input" value="Mekan Ayarla ? Demo Org">
             </div>
             <div class="form-group">
               <label class="form-label">Business type</label>

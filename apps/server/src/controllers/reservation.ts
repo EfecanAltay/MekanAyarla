@@ -1,7 +1,7 @@
 import { Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import * as reservationService from '../services/reservation';
-import { CreateReservationSchema } from '@remotely/shared';
+import { CreateReservationSchema } from '@mekanayarla/shared';
 import { prisma } from '../lib/prisma';
 
 export const createReservation = async (req: AuthRequest, res: Response) => {
@@ -58,7 +58,7 @@ export const getAllReservationsAdmin = async (req: AuthRequest, res: Response) =
   try {
     const userId = req.user?.userId;
     const user = await prisma.user.findUnique({ where: { id: userId } });
-    
+
     if (!user || !user.organizationId || !['BUSINESS_ADMIN', 'SUPER_ADMIN'].includes(user.role)) {
       throw new Error('Unauthorized');
     }

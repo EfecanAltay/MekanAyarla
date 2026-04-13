@@ -8,7 +8,7 @@ export default defineConfig({
   plugins: [react()],
   resolve: {
     alias: {
-      '@remotely/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
+      '@mekanayarla/shared': path.resolve(__dirname, '../../packages/shared/src/index.ts'),
     },
   },
 })

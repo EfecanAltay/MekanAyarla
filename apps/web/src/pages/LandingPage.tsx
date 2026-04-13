@@ -37,7 +37,7 @@ export default function LandingPage() {
       {/* Topbar */}
       <div className="h-[60px] bg-card/80 border-b border-border flex items-center px-5 gap-4 sticky top-0 z-50 backdrop-blur-md">
         <div className="font-display font-extrabold text-xl tracking-tight shrink-0">
-          <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Boş Yer Var MI ?</span>
+          <span className="bg-gradient-to-br from-primary to-accent3 bg-clip-text text-transparent">Mekan Ayarla</span>
           <span className="block text-muted-foreground font-normal text-xs tracking-wider uppercase mt-[-2px]">
             Platform
           </span>
@@ -128,7 +128,7 @@ export default function LandingPage() {
       </main>
 
       <footer className="text-center py-10 text-sm text-muted-foreground/60 border-t border-border bg-card/30">
-        © 2026 bosyervarmi.com • Built with ♥ for multi-tenant SaaS
+        © 2026 MekanAyarla.com • Built with ♥ for multi-tenant SaaS
       </footer>
     </div>
   );

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getResources, getResourceDetails, createResource, createTimeSlots, updateResource, deleteResource, updateSlotStatus, updateDateStatus, batchToggleSlots } from '../controllers/resource';
 import { authenticate, authorize } from '../middleware/auth';
-import { UserRole } from '@remotely/shared';
+import { UserRole } from '@mekanayarla/shared';
 
 const router = Router();
 
