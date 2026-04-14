@@ -18,6 +18,7 @@ export default function PublicBookingPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [guestName, setGuestName] = useState('');
   const [bookingNotes, setBookingNotes] = useState('');
+  const [resourcePassword, setResourcePassword] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
@@ -66,7 +67,8 @@ export default function PublicBookingPage() {
         body: JSON.stringify({
           timeSlotId: finalSlotId,
           guestName: guestName,
-          notes: bookingNotes
+          notes: bookingNotes,
+          resourcePassword: resourcePassword
         })
       });
 
@@ -259,6 +261,24 @@ export default function PublicBookingPage() {
                   onChange={(e) => setBookingNotes(e.target.value)}
                 />
               </div>
+
+              {resourceDetails.hasPassword && (
+                <div className="space-y-2 p-4 bg-primary/5 rounded-2xl border border-primary/20 animate-pulse">
+                  <label className="text-sm font-bold text-primary flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                    {t('booking.password_required') || 'Hizmet Şifresi Gerekli'}
+                  </label>
+                  <Input
+                    required
+                    type="text"
+                    placeholder={t('booking.ph_resource_password') || 'Şifreyi girin'}
+                    value={resourcePassword}
+                    onChange={(e) => setResourcePassword(e.target.value)}
+                    className="h-12 bg-white/80 border-primary/30 focus:ring-primary focus:border-primary text-base font-bold tracking-widest text-center"
+                  />
+                  <p className="text-[0.65rem] text-muted-foreground text-center">Bu hizmete randevu almak için şifre girmeniz gerekmektedir.</p>
+                </div>
+              )}
 
               <div className="bg-primary/5 rounded-2xl p-5 border border-primary/10">
                  <div className="text-[0.65rem] font-bold tracking-widest uppercase text-primary/70 mb-3">Randevu Özeti</div>

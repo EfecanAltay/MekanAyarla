@@ -96,6 +96,8 @@ model Resource {
   offHours       String[]       @default([])
   slots          TimeSlot[]
   isPublic       Boolean        @default(true)
+  password       String?
+  isPasswordProtected Boolean  @default(false)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 }

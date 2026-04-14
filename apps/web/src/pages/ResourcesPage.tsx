@@ -28,6 +28,8 @@ export default function ResourcesPage() {
     slotDuration: 60,
     requiresApproval: false,
     isPublic: true,
+    isPasswordProtected: false,
+    password: '',
     offDays: [] as number[],
     offHours: [] as string[]
   });
@@ -70,6 +72,8 @@ export default function ResourcesPage() {
       startDate: '', endDate: '', startTime: '09:00', endTime: '18:00', slotDuration: 60,
       requiresApproval: false,
       isPublic: true,
+      isPasswordProtected: false,
+      password: '',
       offDays: [], offHours: []
     });
     setIsModalOpen(true);
@@ -91,6 +95,8 @@ export default function ResourcesPage() {
       slotDuration: resource.slotDuration || 60,
       requiresApproval: resource.requiresApproval || false,
       isPublic: resource.isPublic ?? true,
+      isPasswordProtected: resource.isPasswordProtected || false,
+      password: resource.password || '',
       offDays: resource.offDays || [],
       offHours: resource.offHours || []
     });
@@ -487,6 +493,39 @@ export default function ResourcesPage() {
                   placeholder={t('admin.ph_description')}
                   rows={2}
                 />
+              </div>
+
+              <div className="flex flex-col gap-4 p-4 bg-primary/5 rounded-xl border border-primary/10">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <label className="text-[0.8rem] font-bold tracking-wide text-primary flex items-center gap-2">
+                       <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                       {t('admin.password_toggle')}
+                    </label>
+                    <p className="text-[0.6rem] text-muted-foreground mt-0.5">{t('admin.password_toggle_desc')}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, isPasswordProtected: !formData.isPasswordProtected })}
+                    className={`w-10 h-5 rounded-full transition-all relative shrink-0 ${formData.isPasswordProtected ? 'bg-primary shadow-[0_0_12px_rgba(108,99,255,0.4)]' : 'bg-secondary border border-border'}`}
+                  >
+                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${formData.isPasswordProtected ? 'left-5.5' : 'left-0.5'}`} />
+                  </button>
+                </div>
+
+                {formData.isPasswordProtected && (
+                  <div className="pt-2 border-t border-primary/10 fade-in">
+                    <label className="text-[0.7rem] font-semibold text-muted-foreground mb-1.5 block">{t('admin.resource_password')}</label>
+                    <Input
+                      type="text"
+                      value={formData.password}
+                      onChange={e => setFormData({ ...formData, password: e.target.value })}
+                      className="h-10 bg-black/20 border-primary/10 focus:border-primary/40 text-[0.85rem] placeholder:text-muted-foreground/40"
+                      placeholder="Şifreyi belirleyin..."
+                    />
+                    <p className="text-[0.6rem] text-muted-foreground mt-1.5 leading-relaxed">{t('admin.resource_password_desc')}</p>
+                  </div>
+                )}
               </div>
               <div className="flex justify-end pt-4 gap-3 mt-2 border-t border-border/50">
                 <Button

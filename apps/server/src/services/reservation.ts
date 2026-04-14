@@ -37,7 +37,13 @@ export const createReservation = async (input: CreateReservationInput) => {
     const effectiveCapacity = slot.capacity ?? slot.resource.capacity;
     const currentCount = slot._count.reservations;
 
-    // 4. Check capacity
+    // 4. Verify resource password if applicable
+    const resource = slot.resource as any;
+    if (resource.isPasswordProtected && resource.password && resource.password !== input.resourcePassword) {
+      throw new Error('Invalid resource password');
+    }
+
+    // 5. Check capacity
     if (currentCount >= effectiveCapacity) {
       // Logic for waitlist could go here if enabled
       throw new Error('Slot is full');

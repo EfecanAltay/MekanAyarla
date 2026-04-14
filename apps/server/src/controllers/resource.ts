@@ -40,7 +40,13 @@ export const getResourceDetails = async (req: Request, res: Response) => {
 
     if (!resource) throw new Error('Resource not found');
 
-    res.json({ resource });
+    const { password, ...resourceDetails } = resource;
+    res.json({ 
+      resource: {
+        ...resourceDetails,
+        hasPassword: (resourceDetails as any).isPasswordProtected && !!password
+      }
+    });
   } catch (error: any) {
     res.status(404).json({ message: error.message });
   }

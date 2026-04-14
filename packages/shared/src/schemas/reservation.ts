@@ -6,6 +6,7 @@ export const CreateReservationSchema = z.object({
   guestName: z.string().optional(),
   notes: z.string().optional(),
   metadata: z.record(z.any()).optional(),
+  resourcePassword: z.string().optional(),
 });
 
 export const UpdateReservationStatusSchema = z.object({

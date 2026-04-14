@@ -20,6 +20,8 @@ export const ResourceSchema = z.object({
   requiresApproval: z.boolean().default(false),
   active: z.boolean().default(true),
   isPublic: z.boolean().default(true),
+  password: z.string().optional(),
+  isPasswordProtected: z.boolean().default(false),
   branchId: z.string(),
   offDays: z.array(z.number()).optional(),
   offHours: z.array(z.string()).optional(),
