@@ -14,7 +14,12 @@
       "pending": "Pending",
       "cancelled": "Cancelled",
       "waitlist": "Waitlist"
-    }
+    },
+    "copy_link": "Copy link",
+    "link_copied": "Link copied to clipboard!",
+    "optional": "Optional",
+    "share": "Share",
+    "public_booking_link_copied": "Public booking link copied to clipboard!"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -67,7 +72,11 @@
     "sign_in_btn": "Sign in",
     "sign_up_btn": "Create account",
     "no_account": "Don't have an account?",
-    "has_account": "Already have an account?"
+    "has_account": "Already have an account?",
+    "username": "Username",
+    "username_placeholder": "Choose your username",
+    "username_taken": "Username is already taken",
+    "username_available": "Username is available"
   },
   "dashboard": {
     "greeting": "Good morning",

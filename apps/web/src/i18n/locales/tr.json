@@ -14,7 +14,11 @@
       "pending": "Bekliyor",
       "cancelled": "İptal Edildi",
       "waitlist": "Yedekte"
-    }
+    },
+    "copy_link": "Bağlantıyı kopyala",
+    "link_copied": "Bağlantı panoya kopyalandı!",
+    "optional": "Opsiyonel",
+    "share": "Paylaş"
   },
   "nav": {
     "dashboard": "Panel",
@@ -68,7 +72,11 @@
     "sign_up_btn": "Hesap oluştur",
     "no_account": "Hesabınız yok mu?",
     "has_account": "Zaten hesabınız var mı?",
-    "ph_organization": "Örn: İstanbul Üniversitesi"
+    "ph_organization": "Örn: İstanbul Üniversitesi",
+    "username": "Kullanıcı adı",
+    "username_placeholder": "Kullanıcı adınızı seçin",
+    "username_taken": "Kullanıcı adı zaten alınmış",
+    "username_available": "Kullanıcı adı kullanılabilir"
   },
   "dashboard": {
     "greeting": "Günaydın",

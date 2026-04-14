@@ -66,7 +66,7 @@ export default function ResourcesPage() {
       name: '', description: '', capacity: 1,
       branchId: metadata.branches?.[0]?.id || '',
       typeId: metadata.resourceTypes?.[0]?.id || '',
-      startDate: '', endDate: '', startTime: '09:00', endTime: '18:00', slotDuration: 60, 
+      startDate: '', endDate: '', startTime: '09:00', endTime: '18:00', slotDuration: 60,
       requiresApproval: false,
       offDays: [], offHours: []
     });
@@ -140,7 +140,7 @@ export default function ResourcesPage() {
   const copyPublicLink = (id: string) => {
     const url = `${window.location.origin}/public/booking/${id}`;
     navigator.clipboard.writeText(url);
-    alert('Public booking link copied to clipboard!');
+    alert(t('common.link_copied'));
   };
 
   return (

@@ -12,7 +12,7 @@ export const register = async (req: Request, res: Response) => {
       where: {
         OR: [
           { username: validatedData.username },
-          { email: validatedData.email ? validatedData.email : undefined }
+          { email: validatedData.email && validatedData.email !== "" ? validatedData.email : undefined }
         ].filter(v => v.email !== undefined || (v as any).username !== undefined)
       },
     });
@@ -125,7 +125,7 @@ export const me = async (req: any, res: Response) => {
     where: { id: req.user.userId },
     include: { organization: { select: { name: true } } },
   });
-  
+
   if (!user) return res.status(404).json({ message: 'User not found' });
 
   res.json({

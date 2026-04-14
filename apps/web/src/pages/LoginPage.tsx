@@ -53,7 +53,7 @@ export default function LoginPage() {
               <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.username') || 'Username'}</label>
               <Input
                 type="text"
-                placeholder="johndoe"
+                placeholder={t('auth.username_placeholder')}
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required

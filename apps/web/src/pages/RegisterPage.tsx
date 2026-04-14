@@ -111,13 +111,12 @@ export default function RegisterPage() {
               <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.username') || 'Username'}</label>
               <div className="relative">
                 <Input
-                  placeholder="johndoe"
+                  placeholder={t('auth.username_placeholder')}
                   value={formData.username}
                   onChange={handleUsernameChange}
                   required
-                  className={`h-11 bg-secondary/50 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-[0.9rem] pr-10 ${
-                    usernameStatus === 'available' ? 'border-success/50' : usernameStatus === 'taken' ? 'border-destructive/50' : ''
-                  }`}
+                  className={`h-11 bg-secondary/50 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-[0.9rem] pr-10 ${usernameStatus === 'available' ? 'border-success/50' : usernameStatus === 'taken' ? 'border-destructive/50' : ''
+                    }`}
                 />
                 <div className="absolute right-3 top-1/2 -translate-y-1/2">
                   {usernameStatus === 'checking' && <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />}
