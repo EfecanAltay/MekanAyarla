@@ -10,10 +10,13 @@ import { registerTurkishFont } from '../lib/pdf-font';
 export default function AdminReservationsPage() {
   const { t } = useTranslation();
   const [reservations, setReservations] = useState<any[]>([]);
+  const [resources, setResources] = useState<any[]>([]);
+  const [selectedExportResourceId, setSelectedExportResourceId] = useState<string>('all');
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     loadReservations();
+    loadResources();
   }, []);
 
   const loadReservations = async () => {
@@ -24,6 +27,15 @@ export default function AdminReservationsPage() {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const loadResources = async () => {
+    try {
+      const res = await fetchApi('/resources');
+      setResources(res.resources || []);
+    } catch (err) {
+      console.error('Failed to load resources', err);
     }
   };
 
