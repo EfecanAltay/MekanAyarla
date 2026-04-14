@@ -104,9 +104,14 @@ export default function AdminReservationsPage() {
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-2">
                       <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent3 flex items-center justify-center text-[0.6rem] font-bold font-display text-white shrink-0 shadow-sm">
-                        {r.user?.name?.charAt(0) || '?'}
+                        {r.user?.name?.charAt(0) || r.guestName?.charAt(0) || '?'}
                       </div>
-                      <span className="font-medium text-foreground">{r.user?.name || 'Unknown'}</span>
+                      <div className="flex flex-col">
+                        <span className="font-medium text-foreground">{r.user?.name || r.guestName || 'Unknown'}</span>
+                        {!r.user && r.guestName && (
+                          <span className="text-[0.6rem] uppercase tracking-tighter font-bold text-primary/70">Misafir</span>
+                        )}
+                      </div>
                     </div>
                   </td>
                   <td className="px-4 py-3.5">

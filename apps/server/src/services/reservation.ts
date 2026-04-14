@@ -46,7 +46,8 @@ export const createReservation = async (input: CreateReservationInput) => {
     // 5. Create reservation
     return tx.reservation.create({
       data: {
-        userId: input.userId,
+        userId: input.userId || null,
+        guestName: input.guestName,
         timeSlotId: input.timeSlotId,
         notes: input.notes,
         metadata: input.metadata,

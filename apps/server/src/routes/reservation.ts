@@ -1,8 +1,10 @@
 import { Router } from 'express';
-import { createReservation, cancelReservation, getMyReservations, getAllReservationsAdmin, updateReservationStatus } from '../controllers/reservation';
+import { createReservation, cancelReservation, getMyReservations, getAllReservationsAdmin, updateReservationStatus, createPublicReservation } from '../controllers/reservation';
 import { authenticate } from '../middleware/auth';
 
 const router = Router();
+
+router.post('/public', createPublicReservation as any);
 
 router.use(authenticate as any);
 

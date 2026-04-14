@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, X } from 'lucide-react';
+import { Plus, X, Link, Copy } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { fetchApi } from '../lib/api';
@@ -137,6 +137,11 @@ export default function ResourcesPage() {
   const getTypeIcon = (resource: any) => {
     return <CategoryIcon category={resource.type?.category} size={16} />;
   };
+  const copyPublicLink = (id: string) => {
+    const url = `${window.location.origin}/public/booking/${id}`;
+    navigator.clipboard.writeText(url);
+    alert('Public booking link copied to clipboard!');
+  };
 
   return (
     <div className="fade-in p-4 md:p-6 pb-20">
@@ -209,6 +214,9 @@ export default function ResourcesPage() {
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="sm" className="h-7 text-xs px-2 text-primary hover:bg-primary/10" onClick={() => copyPublicLink(r.id)}>
+                        <Link className="w-3 h-3 mr-1" /> {t('common.share') || 'Share'}
+                      </Button>
                       <Button variant="ghost" size="sm" className="h-7 text-xs px-2" onClick={() => handleOpenEdit(r)}>{t('common.edit') || 'Edit'}</Button>
                       <Button variant="ghost" size="sm" className="h-7 text-xs px-2 text-destructive hover:bg-destructive/15" onClick={() => handleDeleteResource(r.id, r.name)}>{t('common.delete') || 'Delete'}</Button>
                     </div>

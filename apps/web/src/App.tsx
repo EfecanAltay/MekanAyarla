@@ -13,6 +13,7 @@ import ResourceTypesPage from './pages/ResourceTypesPage';
 import AdminReservationsPage from './pages/AdminReservationsPage';
 import BranchesPage from './pages/BranchesPage';
 import ProfilePage from './pages/ProfilePage';
+import PublicBookingPage from './pages/PublicBookingPage';
 import { AppLayout } from './components/layout/AppLayout';
 
 function App() {
@@ -36,6 +37,8 @@ function App() {
         <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />} />
         <Route path="/login" element={!isAuthenticated ? <LoginPage /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!isAuthenticated ? <RegisterPage /> : <Navigate to="/dashboard" />} />
+        <Route path="/book/:resourceId" element={<PublicBookingPage />} />
+        <Route path="/public/booking/:resourceId" element={<PublicBookingPage />} />
 
         {/* Protected Routes */}
         <Route element={isAuthenticated ? <AppLayout /> : <Navigate to="/login" />}>

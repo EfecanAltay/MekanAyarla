@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Request, Response } from 'express';
 import { AuthRequest } from '../middleware/auth';
 import * as reservationService from '../services/reservation';
 import { CreateReservationSchema } from '@mekanayarla/shared';
@@ -10,6 +10,24 @@ export const createReservation = async (req: AuthRequest, res: Response) => {
       ...req.body,
       userId: req.user?.userId,
     });
+
+    const reservation = await reservationService.createReservation(validatedData);
+
+    res.status(201).json({ reservation });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const createPublicReservation = async (req: Request, res: Response) => {
+  try {
+    const validatedData = CreateReservationSchema.parse({
+      ...req.body,
+    });
+
+    if (!validatedData.guestName) {
+      throw new Error('Guest name is required for public reservations');
+    }
 
     const reservation = await reservationService.createReservation(validatedData);
 

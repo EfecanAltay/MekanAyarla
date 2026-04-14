@@ -2,7 +2,8 @@ import { z } from 'zod';
 
 export const CreateReservationSchema = z.object({
   timeSlotId: z.string(),
-  userId: z.string(),
+  userId: z.string().optional(),
+  guestName: z.string().optional(),
   notes: z.string().optional(),
   metadata: z.record(z.any()).optional(),
 });
