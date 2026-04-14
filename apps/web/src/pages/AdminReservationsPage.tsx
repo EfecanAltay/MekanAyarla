@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchApi } from '../lib/api';
-import { Search, Download, FileText } from 'lucide-react';
+import { Search, Download, FileText, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { jsPDF } from 'jspdf';
+import type { UserOptions } from 'jspdf-autotable';
 import autoTable from 'jspdf-autotable';
 import { registerTurkishFont } from '../lib/pdf-font';
 
@@ -12,6 +13,7 @@ export default function AdminReservationsPage() {
   const [reservations, setReservations] = useState<any[]>([]);
   const [resources, setResources] = useState<any[]>([]);
   const [selectedExportResourceId, setSelectedExportResourceId] = useState<string>('all');
+  const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -52,41 +54,62 @@ export default function AdminReservationsPage() {
   };
 
   const exportToPDF = () => {
-    const doc = new jsPDF();
-    registerTurkishFont(doc);
+    try {
+      const doc = new jsPDF();
+      registerTurkishFont(doc);
+      doc.setFont("Roboto");
+      doc.setFontSize(11);
 
-    const confirmedReservations = reservations.filter(r => r.status === 'CONFIRMED');
+      let confirmedReservations = reservations.filter(r => r.status === 'CONFIRMED');
 
-    if (confirmedReservations.length === 0) {
-      alert("Dışa aktarılacak onaylı rezervasyon bulunamadı.");
-      return;
+      if (selectedExportResourceId !== 'all') {
+        confirmedReservations = confirmedReservations.filter(r => r.timeSlot?.resourceId === selectedExportResourceId);
+      }
+
+      if (confirmedReservations.length === 0) {
+        alert("Dışa aktarılacak uygun rezervasyon olunamadı.");
+        return;
+      }
+
+      const tableColumn = ["#ID", t('admin.list.attendee'), t('admin.list.resource'), t('admin.list.date'), "Saat"];
+      const tableRows = confirmedReservations.map(r => [
+        String(r.id || '').slice(0, 6),
+        r.user?.name || r.guestName || 'Unknown',
+        r.timeSlot?.resource?.name || 'Unknown Resource',
+        r.timeSlot?.startTime ? new Date(r.timeSlot.startTime).toLocaleDateString() : '--',
+        r.timeSlot?.startTime && r.timeSlot?.endTime
+          ? `${new Date(r.timeSlot.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(r.timeSlot.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+          : '--'
+      ]);
+
+      const resourceName = selectedExportResourceId === 'all'
+        ? t('admin.all_resources') || 'Tüm Kaynaklar'
+        : resources.find(res => res.id === selectedExportResourceId)?.name || '';
+
+      doc.setFontSize(18);
+      doc.text(`${t('admin.confirmed_list_title')} - ${resourceName}`, 14, 22);
+      doc.setFontSize(11);
+      doc.setTextColor(100);
+      doc.text(`Tarih: ${new Date().toLocaleDateString()}`, 14, 30);
+
+      const tableOptions: UserOptions = {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 40,
+        styles: { fontSize: 9, cellPadding: 3, font: "Roboto" },
+        headStyles: { fillColor: [108, 99, 255], textColor: [255, 255, 255], font: "Roboto" },
+        alternateRowStyles: { fillColor: [245, 245, 255] }
+      };
+
+      autoTable(doc, tableOptions);
+
+      const fileName = `Onayli_Rezervasyonlar_${resourceName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;
+      doc.save(fileName);
+      setIsExportModalOpen(false);
+    } catch (err) {
+      console.error('PDF Export Error:', err);
+      alert("PDF oluşturulurken bir hata oluştu. Lütfen tekrar deneyin.");
     }
-
-    const tableColumn = ["#ID", t('admin.list.attendee'), t('admin.list.resource'), t('admin.list.date'), "Saat"];
-    const tableRows = confirmedReservations.map(r => [
-      String(r.id).slice(0, 6),
-      r.user?.name || r.guestName || 'Unknown',
-      r.timeSlot?.resource?.name || '',
-      new Date(r.timeSlot?.startTime).toLocaleDateString(),
-      `${new Date(r.timeSlot?.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(r.timeSlot?.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
-    ]);
-
-    doc.setFontSize(18);
-    doc.text(t('admin.confirmed_list_title'), 14, 22);
-    doc.setFontSize(11);
-    doc.setTextColor(100);
-    doc.text(`Tarih: ${new Date().toLocaleDateString()}`, 14, 30);
-
-    autoTable(doc, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 40,
-      styles: { fontSize: 9, cellPadding: 3, font: "Roboto" },
-      headStyles: { fillColor: [108, 99, 255], textColor: [255, 255, 255], font: "Roboto" },
-      alternateRowStyles: { fillColor: [245, 245, 255] }
-    });
-
-    doc.save(`Onayli_Rezervasyonlar_${new Date().toISOString().split('T')[0]}.pdf`);
   };
 
   const getStatusColor = (status: string) => {
@@ -105,12 +128,12 @@ export default function AdminReservationsPage() {
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">{t('admin.reservations_title')}</h1>
           <p className="text-sm text-muted-foreground">{t('admin.reservations_subtitle')}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <Button variant="secondary" className="shadow-sm">
             <Download className="w-4 h-4 mr-2" />
             CSV
           </Button>
-          <Button variant="default" className="shadow-sm bg-primary hover:bg-primary/90" onClick={exportToPDF}>
+          <Button variant="default" className="shadow-sm bg-primary hover:bg-primary/90" onClick={() => setIsExportModalOpen(true)}>
             <FileText className="w-4 h-4 mr-2" />
             {t('admin.export_pdf')}
           </Button>
@@ -225,6 +248,61 @@ export default function AdminReservationsPage() {
           </table>
         </div>
       </div>
+
+      {/* Export Dialog */}
+      {isExportModalOpen && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsExportModalOpen(false)} />
+          <div className="relative bg-card border border-border rounded-2xl w-full max-w-md shadow-2xl fade-in overflow-hidden">
+            <div className="p-6 border-b border-border bg-secondary/20 flex items-center justify-between">
+              <div>
+                <h2 className="font-display text-xl font-bold">{t('admin.export_dialog_title')}</h2>
+                <p className="text-xs text-muted-foreground mt-1">{t('admin.export_dialog_subtitle')}</p>
+              </div>
+              <button onClick={() => setIsExportModalOpen(false)} className="p-2 hover:bg-secondary rounded-full transition-colors">
+                <X className="w-5 h-5 text-muted-foreground" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-6">
+              <div className="space-y-2">
+                <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground ml-1">Kaynak Seçimi</label>
+                <select
+                  className="w-full h-12 bg-secondary/30 border border-border rounded-xl px-4 text-base focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none cursor-pointer transition-all"
+                  value={selectedExportResourceId}
+                  onChange={(e) => setSelectedExportResourceId(e.target.value)}
+                >
+                  <option value="all">Tüm Kaynaklar</option>
+                  {resources.map(res => (
+                    <option key={res.id} value={res.id}>{res.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 space-y-2">
+                <div className="flex items-center gap-2 text-primary font-bold text-sm">
+                  <FileText className="w-4 h-4" /> PDF Raporu Özellikleri
+                </div>
+                <ul className="text-xs text-muted-foreground space-y-1.5 ml-6 list-disc">
+                  <li>Sadece **onaylanmış** rezervasyonlar dahil edilir.</li>
+                  <li>Türkçe karakter desteği mevcuttur.</li>
+                  <li>Tarih, Saat, Katılımcı ve Kaynak bilgilerini içerir.</li>
+                </ul>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <Button variant="secondary" onClick={() => setIsExportModalOpen(false)} className="flex-1 h-11">
+                  {t('common.cancel')}
+                </Button>
+                <Button onClick={exportToPDF} className="flex-[2] h-11 bg-primary hover:bg-primary/90 font-bold shadow-lg shadow-primary/20">
+                  <FileText className="w-4 h-4 mr-2" />
+                  {t('admin.export_btn')}
+                </Button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
