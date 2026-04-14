@@ -8,12 +8,18 @@ export const register = async (req: Request, res: Response) => {
   try {
     const validatedData = RegisterSchema.parse(req.body);
 
-    const existingUser = await prisma.user.findUnique({
-      where: { email: validatedData.email },
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [
+          { username: validatedData.username },
+          { email: validatedData.email ? validatedData.email : undefined }
+        ].filter(v => v.email !== undefined || (v as any).username !== undefined)
+      },
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: 'User already exists' });
+      const field = existingUser.username === validatedData.username ? 'Username' : 'Email';
+      return res.status(400).json({ message: `${field} already exists` });
     }
 
     const hashedPassword = await bcrypt.hash(validatedData.password, 10);
@@ -30,6 +36,7 @@ export const register = async (req: Request, res: Response) => {
 
       return tx.user.create({
         data: {
+          username: validatedData.username,
           email: validatedData.email,
           password: hashedPassword,
           name: validatedData.name,
@@ -54,6 +61,7 @@ export const register = async (req: Request, res: Response) => {
     res.status(201).json({
       user: {
         id: user.id,
+        username: user.username,
         email: user.email,
         name: user.name,
         role: user.role,
@@ -71,7 +79,7 @@ export const login = async (req: Request, res: Response) => {
     const validatedData = LoginSchema.parse(req.body);
 
     const user = await prisma.user.findUnique({
-      where: { email: validatedData.email },
+      where: { username: validatedData.username },
       include: { organization: true },
     });
 
@@ -94,6 +102,7 @@ export const login = async (req: Request, res: Response) => {
     res.json({
       user: {
         id: user.id,
+        username: user.username,
         email: user.email,
         name: user.name,
         role: user.role,
@@ -122,6 +131,7 @@ export const me = async (req: any, res: Response) => {
   res.json({
     user: {
       id: user.id,
+      username: user.username,
       email: user.email,
       name: user.name,
       role: user.role,
@@ -169,6 +179,23 @@ export const deleteAccount = async (req: any, res: Response) => {
 
     res.clearCookie('token');
     res.json({ message: 'Account deleted successfully' });
+  } catch (error: any) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+export const checkUsernameAvailability = async (req: Request, res: Response) => {
+  try {
+    const { username } = req.query;
+    if (!username || typeof username !== 'string') {
+      return res.status(400).json({ message: 'Username is required' });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
+
+    res.json({ available: !user });
   } catch (error: any) {
     res.status(400).json({ message: error.message });
   }

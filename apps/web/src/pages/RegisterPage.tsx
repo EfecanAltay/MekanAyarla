@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Button } from '../components/ui/button';
@@ -10,17 +10,45 @@ import { useAuthStore } from '../store/useAuthStore';
 export default function RegisterPage() {
   const { t } = useTranslation();
   const [formData, setFormData] = useState({
+    username: '',
     name: '',
     email: '',
     password: '',
     role: 'CUSTOMER' as 'CUSTOMER' | 'BUSINESS_ADMIN',
     organizationName: '',
   });
+  const [usernameStatus, setUsernameStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
   const navigate = useNavigate();
   const setUser = useAuthStore((state) => state.setUser);
+
+  const checkUsername = async (username: string) => {
+    if (username.length < 3) {
+      setUsernameStatus('idle');
+      return;
+    }
+    setUsernameStatus('checking');
+    try {
+      const res = await fetchApi(`/auth/check-username?username=${username}`);
+      setUsernameStatus(res.available ? 'available' : 'taken');
+    } catch (err) {
+      setUsernameStatus('idle');
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      checkUsername(formData.username);
+    }, 500);
+    return () => clearTimeout(timeoutId);
+  }, [formData.username]);
+
+  const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, '');
+    setFormData({ ...formData, username: val });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,6 +56,9 @@ export default function RegisterPage() {
     setError('');
 
     try {
+      if (usernameStatus === 'taken') {
+        throw new Error('Username is already taken');
+      }
       if (formData.role === 'BUSINESS_ADMIN' && !formData.organizationName) {
         throw new Error('Organization name is required for business accounts');
       }
@@ -77,6 +108,27 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
+              <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.username') || 'Username'}</label>
+              <div className="relative">
+                <Input
+                  placeholder="johndoe"
+                  value={formData.username}
+                  onChange={handleUsernameChange}
+                  required
+                  className={`h-11 bg-secondary/50 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-[0.9rem] pr-10 ${
+                    usernameStatus === 'available' ? 'border-success/50' : usernameStatus === 'taken' ? 'border-destructive/50' : ''
+                  }`}
+                />
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {usernameStatus === 'checking' && <div className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />}
+                  {usernameStatus === 'available' && <div className="w-2 h-2 rounded-full bg-success shadow-[0_0_8px_rgba(34,197,94,0.5)]" title="Available" />}
+                  {usernameStatus === 'taken' && <div className="w-2 h-2 rounded-full bg-destructive shadow-[0_0_8px_rgba(239,68,68,0.5)]" title="Taken" />}
+                </div>
+              </div>
+              {usernameStatus === 'taken' && <span className="text-[0.65rem] text-destructive font-medium ml-1">This username is already taken</span>}
+            </div>
+
+            <div className="flex flex-col gap-1.5">
               <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.full_name')}</label>
               <Input
                 placeholder="Ayşe Kaya"
@@ -88,13 +140,12 @@ export default function RegisterPage() {
             </div>
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.email')}</label>
+              <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.email')} ({t('common.optional') || 'Optional'})</label>
               <Input
                 type="email"
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                required
                 className="h-11 bg-secondary/50 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-[0.9rem]"
               />
             </div>

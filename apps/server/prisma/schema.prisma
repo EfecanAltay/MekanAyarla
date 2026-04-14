@@ -30,7 +30,8 @@ enum WaitlistStatus {
 
 model User {
   id             String         @id @default(uuid())
-  email          String         @unique
+  username       String         @unique
+  email          String?        @unique
   password       String
   name           String
   role           UserRole       @default(CUSTOMER)

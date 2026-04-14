@@ -8,7 +8,7 @@ import { useAuthStore } from '../store/useAuthStore';
 
 export default function LoginPage() {
   const { t } = useTranslation();
-  const [email, setEmail] = useState('');
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +22,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      await login(email, password);
+      await login(username, password);
       navigate('/dashboard');
     } catch (err: any) {
       setError(err.message || t('common.error'));
@@ -50,12 +50,12 @@ export default function LoginPage() {
             )}
 
             <div className="flex flex-col gap-1.5">
-              <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.email')}</label>
+              <label className="text-[0.8rem] font-semibold tracking-wide text-muted-foreground">{t('auth.username') || 'Username'}</label>
               <Input
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="text"
+                placeholder="johndoe"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
                 required
                 className="h-11 bg-secondary/50 border-border focus:border-primary focus:ring-2 focus:ring-primary/20 text-[0.9rem]"
               />
