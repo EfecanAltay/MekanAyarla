@@ -108,6 +108,8 @@
     "new_resource": "Yeni Hizmet Oluştur",
     "resource_name": "Hizmet Adı",
     "requires_approval": "Onay Gerekiyor",
+    "is_public": "Paylaşılabilir",
+    "is_public_desc": "Müşteriler bu kaynağı giriş yapmadan görebilir ve randevu alabilir",
     "description": "Açıklama",
     "capacity": "Kapasite",
     "branch": "Şube",

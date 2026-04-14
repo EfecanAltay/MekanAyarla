@@ -108,6 +108,8 @@
     "new_resource": "New Resource",
     "resource_name": "Resource Name",
     "requires_approval": "Requires Approval",
+    "is_public": "Publicly Shareable",
+    "is_public_desc": "Guests can view and book this resource without logging in",
     "description": "Description",
     "capacity": "Capacity",
     "branch": "Branch",

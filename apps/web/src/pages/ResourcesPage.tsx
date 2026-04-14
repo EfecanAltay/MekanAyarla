@@ -27,6 +27,7 @@ export default function ResourcesPage() {
     endTime: '18:00',
     slotDuration: 60,
     requiresApproval: false,
+    isPublic: true,
     offDays: [] as number[],
     offHours: [] as string[]
   });
@@ -68,6 +69,7 @@ export default function ResourcesPage() {
       typeId: metadata.resourceTypes?.[0]?.id || '',
       startDate: '', endDate: '', startTime: '09:00', endTime: '18:00', slotDuration: 60,
       requiresApproval: false,
+      isPublic: true,
       offDays: [], offHours: []
     });
     setIsModalOpen(true);
@@ -88,6 +90,7 @@ export default function ResourcesPage() {
       endTime: resource.endTime || '18:00',
       slotDuration: resource.slotDuration || 60,
       requiresApproval: resource.requiresApproval || false,
+      isPublic: resource.isPublic ?? true,
       offDays: resource.offDays || [],
       offHours: resource.offHours || []
     });
@@ -214,9 +217,11 @@ export default function ResourcesPage() {
                   </td>
                   <td className="px-4 py-3.5">
                     <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="sm" className="h-7 text-xs px-2 text-primary hover:bg-primary/10" onClick={() => copyPublicLink(r.id)}>
-                        <Link className="w-3 h-3 mr-1" /> {t('common.share') || 'Share'}
-                      </Button>
+                      {r.isPublic && (
+                        <Button variant="ghost" size="sm" className="h-7 text-xs px-2 text-primary hover:bg-primary/10" onClick={() => copyPublicLink(r.id)}>
+                          <Link className="w-3 h-3 mr-1" /> {t('common.share') || 'Share'}
+                        </Button>
+                      )}
                       <Button variant="ghost" size="sm" className="h-7 text-xs px-2" onClick={() => handleOpenEdit(r)}>{t('common.edit') || 'Edit'}</Button>
                       <Button variant="ghost" size="sm" className="h-7 text-xs px-2 text-destructive hover:bg-destructive/15" onClick={() => handleDeleteResource(r.id, r.name)}>{t('common.delete') || 'Delete'}</Button>
                     </div>
@@ -306,18 +311,34 @@ export default function ResourcesPage() {
                 </select>
               </div>
 
-              <div className="flex items-center justify-between p-3.5 bg-secondary/30 border border-border rounded-xl">
-                <div>
-                  <label className="text-sm font-bold text-foreground block">{t('admin.requires_approval')}</label>
-                  <p className="text-[0.65rem] text-muted-foreground mt-0.5">Randevular bu kaynak için admin onayına düşer.</p>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center justify-between p-3.5 bg-secondary/30 border border-border rounded-xl">
+                  <div>
+                    <label className="text-sm font-bold text-foreground block">{t('admin.requires_approval')}</label>
+                    <p className="text-[0.6rem] text-muted-foreground mt-0.5">Onay gerektirir.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, requiresApproval: !formData.requiresApproval })}
+                    className={`w-10 h-5 rounded-full transition-all relative shrink-0 ${formData.requiresApproval ? 'bg-primary shadow-[0_0_12px_rgba(108,99,255,0.4)]' : 'bg-secondary border border-border'}`}
+                  >
+                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${formData.requiresApproval ? 'left-5.5' : 'left-0.5'}`} />
+                  </button>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setFormData({ ...formData, requiresApproval: !formData.requiresApproval })}
-                  className={`w-10 h-5 rounded-full transition-all relative shrink-0 ${formData.requiresApproval ? 'bg-primary shadow-[0_0_12px_rgba(108,99,255,0.4)]' : 'bg-secondary border border-border'}`}
-                >
-                  <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${formData.requiresApproval ? 'left-5.5' : 'left-0.5'}`} />
-                </button>
+
+                <div className="flex items-center justify-between p-3.5 bg-secondary/30 border border-border rounded-xl">
+                  <div>
+                    <label className="text-sm font-bold text-foreground block">{t('admin.is_public')}</label>
+                    <p className="text-[0.6rem] text-muted-foreground mt-0.5">{t('admin.is_public_desc')}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, isPublic: !formData.isPublic })}
+                    className={`w-10 h-5 rounded-full transition-all relative shrink-0 ${formData.isPublic ? 'bg-success shadow-[0_0_12px_rgba(34,197,94,0.4)]' : 'bg-secondary border border-border'}`}
+                  >
+                    <div className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow-sm transition-all ${formData.isPublic ? 'left-5.5' : 'left-0.5'}`} />
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

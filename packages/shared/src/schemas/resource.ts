@@ -19,6 +19,7 @@ export const ResourceSchema = z.object({
   slotDuration: z.number().int().positive().optional(),
   requiresApproval: z.boolean().default(false),
   active: z.boolean().default(true),
+  isPublic: z.boolean().default(true),
   branchId: z.string(),
   offDays: z.array(z.number()).optional(),
   offHours: z.array(z.string()).optional(),
