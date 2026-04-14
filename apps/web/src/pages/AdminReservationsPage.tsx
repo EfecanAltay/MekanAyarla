@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fetchApi } from '../lib/api';
-import { Search, Download } from 'lucide-react';
+import { Search, Download, FileText } from 'lucide-react';
 import { Button } from '../components/ui/button';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import { registerTurkishFont } from '../lib/pdf-font';
 
 export default function AdminReservationsPage() {
   const { t } = useTranslation();
@@ -36,6 +39,44 @@ export default function AdminReservationsPage() {
     }
   };
 
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+    registerTurkishFont(doc);
+
+    const confirmedReservations = reservations.filter(r => r.status === 'CONFIRMED');
+
+    if (confirmedReservations.length === 0) {
+      alert("Dışa aktarılacak onaylı rezervasyon bulunamadı.");
+      return;
+    }
+
+    const tableColumn = ["#ID", t('admin.list.attendee'), t('admin.list.resource'), t('admin.list.date'), "Saat"];
+    const tableRows = confirmedReservations.map(r => [
+      String(r.id).slice(0, 6),
+      r.user?.name || r.guestName || 'Unknown',
+      r.timeSlot?.resource?.name || '',
+      new Date(r.timeSlot?.startTime).toLocaleDateString(),
+      `${new Date(r.timeSlot?.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(r.timeSlot?.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+    ]);
+
+    doc.setFontSize(18);
+    doc.text(t('admin.confirmed_list_title'), 14, 22);
+    doc.setFontSize(11);
+    doc.setTextColor(100);
+    doc.text(`Tarih: ${new Date().toLocaleDateString()}`, 14, 30);
+
+    autoTable(doc, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 40,
+      styles: { fontSize: 9, cellPadding: 3, font: "Roboto" },
+      headStyles: { fillColor: [108, 99, 255], textColor: [255, 255, 255], font: "Roboto" },
+      alternateRowStyles: { fillColor: [245, 245, 255] }
+    });
+
+    doc.save(`Onayli_Rezervasyonlar_${new Date().toISOString().split('T')[0]}.pdf`);
+  };
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case 'CONFIRMED': return 'bg-success/15 text-success border border-success/20';
@@ -52,10 +93,16 @@ export default function AdminReservationsPage() {
           <h1 className="font-display text-2xl font-bold tracking-tight mb-1">{t('admin.reservations_title')}</h1>
           <p className="text-sm text-muted-foreground">{t('admin.reservations_subtitle')}</p>
         </div>
-        <Button variant="secondary" className="shadow-sm">
-          <Download className="w-4 h-4 mr-2" />
-          Export CSV
-        </Button>
+        <div className="flex gap-2">
+          <Button variant="secondary" className="shadow-sm">
+            <Download className="w-4 h-4 mr-2" />
+            CSV
+          </Button>
+          <Button variant="default" className="shadow-sm bg-primary hover:bg-primary/90" onClick={exportToPDF}>
+            <FileText className="w-4 h-4 mr-2" />
+            {t('admin.export_pdf')}
+          </Button>
+        </div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-5">
