@@ -11,8 +11,7 @@ RUN npm install --os=linux --cpu=x64
 RUN npm install \
     @rolldown/binding-linux-x64-gnu \
     lightningcss-linux-x64-gnu \
-    @tailwindcss/oxide-linux-x64-gnu \
-    @tailwindcss/node-linux-x64-gnu
+    @tailwindcss/oxide-linux-x64-gnu
 
 COPY packages/shared ./packages/shared
 COPY apps/web ./apps/web
