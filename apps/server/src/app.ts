@@ -9,6 +9,7 @@ import organizationRoutes from './routes/organization';
 import resourceTypeRoutes from './routes/resourceType';
 import branchRoutes from './routes/branch';
 
+//...
 const app = express();
 
 app.use(cors({
