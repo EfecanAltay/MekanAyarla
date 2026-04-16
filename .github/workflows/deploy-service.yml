@@ -15,6 +15,9 @@ on:
       version:
         type: string
         required: true
+      CLIENT_URL:
+        type: string
+        required: true
     secrets:
       THEFOODHEROAPI_SECRET:
         required: true
@@ -24,6 +27,7 @@ on:
         required: true
       DATABASE_URL:
         required: true
+
 
 jobs:
   deploy:
@@ -48,12 +52,13 @@ jobs:
           DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          CLIENT_URL: ${{ inputs.CLIENT_URL }}
           SERVICE: ${{ inputs.service_name }}
           TAG: ${{ inputs.version }}
         run: |
           ssh -o StrictHostKeyChecking=no \
           ${{ inputs.SERVER_USER }}@${{ inputs.SERVER_HOST }} \
-          "DOCKER_USER='$DOCKER_USER' DOCKER_PASS='$DOCKER_PASS' DATABASE_URL='$DATABASE_URL' SERVICE='$SERVICE' TAG='$TAG' bash -s" << 'EOF'
+          "DOCKER_USER='$DOCKER_USER' DOCKER_PASS='$DOCKER_PASS' DATABASE_URL='$DATABASE_URL' CLIENT_URL='$CLIENT_URL' SERVICE='$SERVICE' TAG='$TAG' bash -s" << 'EOF'
             set -e
 
             cd /app/mekanayarla
@@ -83,6 +88,7 @@ jobs:
             WEB_IMAGE="$WEB_IMAGE" \
             IMAGE_TAG="$IMAGE_TAG" \
             DATABASE_URL="$DATABASE_URL" \
+            CLIENT_URL="$CLIENT_URL" \
             docker compose pull "$SERVICE"
 
             echo "♻️ Recreating $SERVICE container..."
@@ -90,6 +96,7 @@ jobs:
             WEB_IMAGE="$WEB_IMAGE" \
             IMAGE_TAG="$IMAGE_TAG" \
             DATABASE_URL="$DATABASE_URL" \
+            CLIENT_URL="$CLIENT_URL" \
             docker compose up -d --force-recreate --no-deps "$SERVICE"
 
             echo "🧹 Keeping last 2 images for $SERVICE..."

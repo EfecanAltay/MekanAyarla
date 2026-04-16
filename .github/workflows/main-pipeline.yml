@@ -65,6 +65,7 @@ jobs:
       SERVER_USER: ${{ vars.SERVER_USER }}
       service_name: web
       version: ${{ needs.detect.outputs.version }}
+      CLIENT_URL: 'https://mekanayarla.com'
     secrets:
       THEFOODHEROAPI_SECRET: ${{ github.ref == 'refs/heads/test' && secrets.THEFOODHEROAPI_SECRET_TEST || secrets.THEFOODHEROAPI_SECRET }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -92,6 +93,7 @@ jobs:
       SERVER_USER: ${{ vars.SERVER_USER }}
       service_name: server
       version: ${{ needs.detect.outputs.version }}
+      CLIENT_URL: 'https://mekanayarla.com'
     secrets:
       DATABASE_URL: ${{ github.ref == 'refs/heads/test' && secrets.DATABASE_URL_TEST || secrets.DATABASE_URL }}
       THEFOODHEROAPI_SECRET: ${{ github.ref == 'refs/heads/test' && secrets.THEFOODHEROAPI_SECRET_TEST || secrets.THEFOODHEROAPI_SECRET }}
