@@ -8,7 +8,11 @@ COPY apps/web/package.json ./apps/web/package.json
 COPY apps/server/package.json ./apps/server/package.json
 
 RUN npm install --os=linux --cpu=x64
-RUN npm install @rolldown/binding-linux-x64-gnu@1.0.0-rc.15 lightningcss-linux-x64-gnu@1.32.0
+RUN npm install \
+    @rolldown/binding-linux-x64-gnu \
+    lightningcss-linux-x64-gnu \
+    @tailwindcss/oxide-linux-x64-gnu \
+    @tailwindcss/node-linux-x64-gnu
 
 COPY packages/shared ./packages/shared
 COPY apps/web ./apps/web
