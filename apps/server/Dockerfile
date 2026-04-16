@@ -35,4 +35,4 @@ COPY --from=server-builder /app/apps/server/prisma ./apps/server/prisma
 RUN npm install --omit=dev
 
 WORKDIR /app/apps/server
-CMD ["node", "dist/src/index.js"]
+CMD ["node", "dist/index.js"]
