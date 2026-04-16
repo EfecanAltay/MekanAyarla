@@ -12,6 +12,9 @@ on:
       service_name:
         type: string
         required: true
+      version:
+        type: string
+        required: true
     secrets:
       THEFOODHEROAPI_SECRET:
         required: true
@@ -31,40 +34,39 @@ jobs:
           ssh-private-key: ${{ secrets.THEFOODHEROAPI_SECRET }}
 
       - name: 🚀 Deploy Service
+        env:
+          DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+          SERVICE: ${{ inputs.service_name }}
+          TAG: ${{ inputs.version }}
         run: |
           ssh -o StrictHostKeyChecking=no \
-          ${{ inputs.SERVER_USER }}@${{ inputs.SERVER_HOST }} << EOF
-
+          ${{ inputs.SERVER_USER }}@${{ inputs.SERVER_HOST }} "DOCKER_USER='$DOCKER_USER' DOCKER_PASS='$DOCKER_PASS' SERVICE='$SERVICE' TAG='$TAG' bash -s" << 'EOF'
             set -e
-
             cd /app/mekanayarla
 
-            SERVICE="${{ inputs.service_name }}"
-            IMAGE_TAG="${{ github.sha }}"
-            DOCKER_USER="${{ secrets.DOCKERHUB_USERNAME }}"
+            DOCKER_REPOSITORY="$DOCKER_USER/mekanayarla-$SERVICE"
+            IMAGE_TAG="$TAG"
 
-            export DOCKER_REPOSITORY="\$DOCKER_USER/mekanayarla-\$SERVICE"
-            export IMAGE_TAG
+            echo "🚀 Deploying $SERVICE"
+            echo "📦 Image: $DOCKER_REPOSITORY:$IMAGE_TAG"
 
-            echo "🚀 Deploying \$SERVICE"
-            echo "📦 Image: \$DOCKER_REPOSITORY:\$IMAGE_TAG"
-
-            echo "\${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username "\$DOCKER_USER" --password-stdin
+            echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
 
             echo "🌐 Ensuring network exists: mekanayarla_net"
             docker network inspect mekanayarla_net >/dev/null 2>&1 || docker network create mekanayarla_net
 
-            echo "🧹 Pre-deploy cleanup for \$SERVICE..."
-            docker image rm -f "\$DOCKER_REPOSITORY:\$IMAGE_TAG" || true
+            echo "🧹 Pre-deploy cleanup for $SERVICE..."
+            docker image rm -f "$DOCKER_REPOSITORY:$IMAGE_TAG" || true
 
-            # Update docker-compose file image or use environment variables
-            # Assuming docker-compose.yml uses image: ${DOCKER_REPOSITORY}:${IMAGE_TAG}
-            DOCKER_REPOSITORY=\$DOCKER_REPOSITORY IMAGE_TAG=\$IMAGE_TAG docker compose pull "\$SERVICE"
-            DOCKER_REPOSITORY=\$DOCKER_REPOSITORY IMAGE_TAG=\$IMAGE_TAG docker compose up -d --force-recreate "\$SERVICE"
+            # Pull and Update
+            DOCKER_REPOSITORY=$DOCKER_REPOSITORY IMAGE_TAG=$IMAGE_TAG docker compose pull "$SERVICE"
+            DOCKER_REPOSITORY=$DOCKER_REPOSITORY IMAGE_TAG=$IMAGE_TAG docker compose up -d --force-recreate "$SERVICE"
 
-            echo "🧹 Keeping last 2 images for \$SERVICE..."
-            docker images "\$DOCKER_REPOSITORY" \
+            echo "🧹 Keeping last 2 images for $SERVICE..."
+            docker images "$DOCKER_REPOSITORY" \
               --format "{{.ID}} {{.CreatedAt}}" | \
-              sort -r | tail -n +3 | awk '{print \$1}' | xargs -r docker rmi || true
+              sort -r | tail -n +3 | awk '{print $1}' | xargs -r docker rmi || true
 
+            docker logout
           EOF

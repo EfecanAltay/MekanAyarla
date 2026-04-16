@@ -6,6 +6,9 @@ on:
       service_name:
         required: true
         type: string
+      version:
+        required: true
+        type: string
     secrets:
       DOCKERHUB_USERNAME:
         required: true
@@ -31,6 +34,7 @@ jobs:
           echo "SERVICE_NAME=${{ inputs.service_name }}" >> $GITHUB_ENV
           echo "DOCKER_REPOSITORY=${{ secrets.DOCKERHUB_USERNAME }}/mekanayarla-${{ inputs.service_name }}" >> $GITHUB_ENV
           echo "IMAGE_TAG=${{ github.sha }}" >> $GITHUB_ENV
+          echo "IMAGE_VERSION=${{ inputs.version }}" >> $GITHUB_ENV
           if [ "${{ github.ref_name }}" == "main" ]; then
             echo "NODE_ENV_VALUE=production" >> $GITHUB_ENV
           else
@@ -46,13 +50,19 @@ jobs:
             -t ${SERVICE_NAME} \
             .
 
-      - name: Tag Docker image
+      - name: Tag & Push Docker image
         if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test')
         run: |
-          docker tag ${SERVICE_NAME}:latest \
-            ${DOCKER_REPOSITORY}:${IMAGE_TAG}
+          # Tag with Commit SHA (for exact traceability)
+          docker tag ${SERVICE_NAME}:latest ${DOCKER_REPOSITORY}:${IMAGE_TAG}
+          
+          # Tag with Semantic Version (for easy tracking v1, v2...)
+          docker tag ${SERVICE_NAME}:latest ${DOCKER_REPOSITORY}:${IMAGE_VERSION}
+          
+          # Tag with latest (for current prod)
+          docker tag ${SERVICE_NAME}:latest ${DOCKER_REPOSITORY}:latest
 
-      - name: Push Docker image
-        if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test')
-        run: |
+          # Push all tags
           docker push ${DOCKER_REPOSITORY}:${IMAGE_TAG}
+          docker push ${DOCKER_REPOSITORY}:${IMAGE_VERSION}
+          docker push ${DOCKER_REPOSITORY}:latest
