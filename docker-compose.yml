@@ -2,6 +2,7 @@ version: '3.8'
 
 services:
   server:
+    image: ${DOCKER_REPOSITORY:-mekanayarla-server}:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: apps/server/Dockerfile
@@ -16,6 +17,7 @@ services:
       - mekanayarla-network
 
   web:
+    image: ${DOCKER_REPOSITORY:-mekanayarla-web}:${IMAGE_TAG:-latest}
     build:
       context: .
       dockerfile: apps/web/Dockerfile
