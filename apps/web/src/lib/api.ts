@@ -1,8 +1,8 @@
-const BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const BASE_URL = import.meta.env.VITE_API_URL || 'https://api.mekanayarla.com';
 
 export async function fetchApi(endpoint: string, options: RequestInit = {}) {
   const url = `${BASE_URL}${endpoint}`;
-  
+
   const headers = new Headers(options.headers);
   if (!(options.body instanceof FormData)) {
     headers.set('Content-Type', 'application/json');
