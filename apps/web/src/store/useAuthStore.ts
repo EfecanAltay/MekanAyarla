@@ -16,11 +16,11 @@ export const useAuthStore = create<AuthState>((set) => ({
   user: null,
   isAuthenticated: false,
   isLoading: true,
-  login: async (email, password) => {
+  login: async (username, password) => {
     try {
       const { user } = await fetchApi('/auth/login', {
         method: 'POST',
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ username, password }),
       });
       set({ user, isAuthenticated: !!user, isLoading: false });
     } catch (error) {
