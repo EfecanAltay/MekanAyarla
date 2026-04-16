@@ -69,6 +69,7 @@ jobs:
       THEFOODHEROAPI_SECRET: ${{ github.ref == 'refs/heads/test' && secrets.THEFOODHEROAPI_SECRET_TEST || secrets.THEFOODHEROAPI_SECRET }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+      DATABASE_URL: ""
 
   # SERVER
   build-server:
@@ -92,6 +93,7 @@ jobs:
       service_name: server
       version: ${{ needs.detect.outputs.version }}
     secrets:
+      DATABASE_URL: ${{ github.ref == 'refs/heads/test' && secrets.DATABASE_URL_TEST || secrets.DATABASE_URL }}
       THEFOODHEROAPI_SECRET: ${{ github.ref == 'refs/heads/test' && secrets.THEFOODHEROAPI_SECRET_TEST || secrets.THEFOODHEROAPI_SECRET }}
       DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}

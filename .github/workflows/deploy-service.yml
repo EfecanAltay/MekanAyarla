@@ -22,6 +22,8 @@ on:
         required: true
       DOCKERHUB_TOKEN:
         required: true
+      DATABASE_URL:
+        required: true
 
 jobs:
   deploy:
@@ -45,19 +47,24 @@ jobs:
         env:
           DOCKER_USER: ${{ secrets.DOCKERHUB_USERNAME }}
           DOCKER_PASS: ${{ secrets.DOCKERHUB_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           SERVICE: ${{ inputs.service_name }}
           TAG: ${{ inputs.version }}
         run: |
           ssh -o StrictHostKeyChecking=no \
-          ${{ inputs.SERVER_USER }}@${{ inputs.SERVER_HOST }} "DOCKER_USER='$DOCKER_USER' DOCKER_PASS='$DOCKER_PASS' SERVICE='$SERVICE' TAG='$TAG' bash -s" << 'EOF'
+          ${{ inputs.SERVER_USER }}@${{ inputs.SERVER_HOST }} \
+          "DOCKER_USER='$DOCKER_USER' DOCKER_PASS='$DOCKER_PASS' DATABASE_URL='$DATABASE_URL' SERVICE='$SERVICE' TAG='$TAG' bash -s" << 'EOF'
             set -e
+
             cd /app/mekanayarla
 
-            DOCKER_REPOSITORY="$DOCKER_USER/mekanayarla-$SERVICE"
+            SERVER_IMAGE="$DOCKER_USER/mekanayarla-server"
+            WEB_IMAGE="$DOCKER_USER/mekanayarla-web"
             IMAGE_TAG="$TAG"
 
             echo "🚀 Deploying $SERVICE"
-            echo "📦 Image: $DOCKER_REPOSITORY:$IMAGE_TAG"
+            echo "📦 Server image: $SERVER_IMAGE:$IMAGE_TAG"
+            echo "📦 Web image: $WEB_IMAGE:$IMAGE_TAG"
 
             echo "$DOCKER_PASS" | docker login --username "$DOCKER_USER" --password-stdin
 
@@ -65,16 +72,42 @@ jobs:
             docker network inspect mekanayarla_net >/dev/null 2>&1 || docker network create mekanayarla_net
 
             echo "🧹 Pre-deploy cleanup for $SERVICE..."
-            docker image rm -f "$DOCKER_REPOSITORY:$IMAGE_TAG" || true
+            if [ "$SERVICE" = "server" ]; then
+              docker image rm -f "$SERVER_IMAGE:$IMAGE_TAG" || true
+            elif [ "$SERVICE" = "web" ]; then
+              docker image rm -f "$WEB_IMAGE:$IMAGE_TAG" || true
+            fi
 
-            # Pull and Update
-            DOCKER_REPOSITORY=$DOCKER_REPOSITORY IMAGE_TAG=$IMAGE_TAG docker compose pull "$SERVICE"
-            DOCKER_REPOSITORY=$DOCKER_REPOSITORY IMAGE_TAG=$IMAGE_TAG docker compose up -d --force-recreate "$SERVICE"
+            echo "📥 Pulling latest image for $SERVICE..."
+            SERVER_IMAGE="$SERVER_IMAGE" \
+            WEB_IMAGE="$WEB_IMAGE" \
+            IMAGE_TAG="$IMAGE_TAG" \
+            DATABASE_URL="$DATABASE_URL" \
+            docker compose pull "$SERVICE"
+
+            echo "♻️ Recreating $SERVICE container..."
+            SERVER_IMAGE="$SERVER_IMAGE" \
+            WEB_IMAGE="$WEB_IMAGE" \
+            IMAGE_TAG="$IMAGE_TAG" \
+            DATABASE_URL="$DATABASE_URL" \
+            docker compose up -d --force-recreate "$SERVICE"
 
             echo "🧹 Keeping last 2 images for $SERVICE..."
-            docker images "$DOCKER_REPOSITORY" \
-              --format "{{.ID}} {{.CreatedAt}}" | \
-              sort -r | tail -n +3 | awk '{print $1}' | xargs -r docker rmi || true
+            if [ "$SERVICE" = "server" ]; then
+              TARGET_REPOSITORY="$SERVER_IMAGE"
+            elif [ "$SERVICE" = "web" ]; then
+              TARGET_REPOSITORY="$WEB_IMAGE"
+            else
+              echo "❌ Unknown service: $SERVICE"
+              exit 1
+            fi
+
+            docker images "$TARGET_REPOSITORY" \
+              --format "{{.Repository}}:{{.Tag}} {{.ID}}" | \
+              grep -v ":latest " | \
+              awk '{print $2}' | \
+              tail -n +3 | \
+              xargs -r docker rmi || true
 
             docker logout
-          EOF
+          EOF
