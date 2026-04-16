@@ -3,7 +3,7 @@ import { useEffect, lazy, Suspense } from 'react';
 import { useAuthStore } from './store/useAuthStore';
 import { AppLayout } from './components/layout/AppLayout';
 
-// Lazy load pages
+// Lazy load pages 
 const LandingPage = lazy(() => import('./pages/LandingPage'));
 const LoginPage = lazy(() => import('./pages/LoginPage'));
 const RegisterPage = lazy(() => import('./pages/RegisterPage'));
