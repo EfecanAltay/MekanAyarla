@@ -1,0 +1,96 @@
+name: 🏗️ MekanAyarla CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, test]
+  pull_request:
+    branches: [main, test]
+
+jobs:
+  detect:
+    runs-on: ubuntu-latest
+    outputs:
+      web: ${{ steps.out.outputs.web }}
+      server: ${{ steps.out.outputs.server }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - id: out
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            CHANGED=$(git diff --name-only origin/${{ github.base_ref }} HEAD)
+          else
+            CHANGED=$(git diff --name-only HEAD~1 HEAD)
+          fi
+
+          echo "Changed files: $CHANGED"
+
+          WEB=false
+          SERVER=false
+          SHARED=false
+
+          echo "$CHANGED" | grep -q "^apps/web/" && WEB=true
+          echo "$CHANGED" | grep -q "^apps/server/" && SERVER=true
+          echo "$CHANGED" | grep -q "^packages/shared/" && SHARED=true
+
+          if [ "$SHARED" = true ]; then
+            WEB=true
+            SERVER=true
+          fi
+
+          echo "web=$WEB" >> $GITHUB_OUTPUT
+          echo "server=$SERVER" >> $GITHUB_OUTPUT
+
+  # WEB
+  build-web:
+    needs: detect
+    if: needs.detect.outputs.web == 'true'
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service_name: web
+      aws_region: eu-north-1
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ github.ref == 'refs/heads/test' && secrets.AWS_SECRET_ACCESS_KEY_TEST || secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ github.ref == 'refs/heads/test' && secrets.AWS_ACCESS_KEY_ID_TEST || secrets.AWS_ACCESS_KEY_ID }}
+
+  deploy-web:
+    needs: build-web
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test'
+    uses: ./.github/workflows/deploy-service.yml
+    with:
+      SERVER_HOST: ${{ github.ref == 'refs/heads/test' && vars.SERVER_HOST_TEST || vars.SERVER_HOST }}
+      SERVER_USER: ${{ vars.SERVER_USER }}
+      service_name: web
+      aws_region: eu-north-1
+    secrets:
+      THEFOODHEROAPI_SECRET: ${{ github.ref == 'refs/heads/test' && secrets.THEFOODHEROAPI_SECRET_TEST || secrets.THEFOODHEROAPI_SECRET }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+
+  # SERVER
+  build-server:
+    needs: detect
+    if: needs.detect.outputs.server == 'true'
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service_name: server
+      aws_region: eu-north-1
+    secrets:
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ github.ref == 'refs/heads/test' && secrets.AWS_SECRET_ACCESS_KEY_TEST || secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_ACCESS_KEY_ID: ${{ github.ref == 'refs/heads/test' && secrets.AWS_ACCESS_KEY_ID_TEST || secrets.AWS_ACCESS_KEY_ID }}
+
+  deploy-server:
+    needs: build-server
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test'
+    uses: ./.github/workflows/deploy-service.yml
+    with:
+      SERVER_HOST: ${{ github.ref == 'refs/heads/test' && vars.SERVER_HOST_TEST || vars.SERVER_HOST }}
+      SERVER_USER: ${{ vars.SERVER_USER }}
+      service_name: server
+      aws_region: eu-north-1
+    secrets:
+      THEFOODHEROAPI_SECRET: ${{ github.ref == 'refs/heads/test' && secrets.THEFOODHEROAPI_SECRET_TEST || secrets.THEFOODHEROAPI_SECRET }}
+      AWS_ACCOUNT_ID: ${{ secrets.AWS_ACCOUNT_ID }}

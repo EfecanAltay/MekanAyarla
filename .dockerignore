@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.gitignore
+README.md
+*.log
+.env
+.cursor
+.gemini
+apps/**/node_modules
+packages/**/node_modules
+apps/**/dist
+packages/**/dist

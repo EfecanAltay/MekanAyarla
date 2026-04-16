@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: apps/server/Dockerfile
+    container_name: mekanayarla-server
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://thefoodhero_system:thefoodhero-db-admin@thefoodhero-dbt.czqmmcmc613w.eu-north-1.rds.amazonaws.com/mekanayarla?schema=public
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    networks:
+      - mekanayarla-network
+
+  web:
+    build:
+      context: .
+      dockerfile: apps/web/Dockerfile
+    container_name: mekanayarla-web
+    ports:
+      - "90:80"
+    depends_on:
+      - server
+    networks:
+      - mekanayarla-network
+
+networks:
+  mekanayarla-network:
+    driver: bridge

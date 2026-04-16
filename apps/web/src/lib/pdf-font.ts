@@ -6,5 +6,5 @@ export const robotoBase64 = "AAEAAAASAQAABAAgR0RFRrRCs+0AAAEsAAAAQEdQTVPU99PtAAA
 export const registerTurkishFont = (doc: any) => {
   doc.addFileToVFS("Roboto-Regular.ttf", robotoBase64);
   doc.addFont("Roboto-Regular.ttf", "Roboto", "normal");
-  doc.setFont("Roboto");
+  doc.setFont("Roboto", "normal");
 };

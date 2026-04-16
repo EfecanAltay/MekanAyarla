@@ -4,8 +4,7 @@ import { fetchApi } from '../lib/api';
 import { Search, Download, FileText, X } from 'lucide-react';
 import { Button } from '../components/ui/button';
 import { jsPDF } from 'jspdf';
-import type { UserOptions } from 'jspdf-autotable';
-import autoTable from 'jspdf-autotable';
+import autoTable, { type UserOptions } from 'jspdf-autotable';
 import { registerTurkishFont } from '../lib/pdf-font';
 
 export default function AdminReservationsPage() {
@@ -92,15 +91,35 @@ export default function AdminReservationsPage() {
       doc.setTextColor(100);
       doc.text(`Tarih: ${new Date().toLocaleDateString()}`, 14, 30);
 
+      // Sanitize all data to strings to prevent 'widths' undefined error
+      const sanitizedColumn = tableColumn.map(c => String(c || ''));
+      const sanitizedRows = tableRows.map(row => row.map(cell => String(cell || '')));
+
       const tableOptions: UserOptions = {
-        head: [tableColumn],
-        body: tableRows,
+        head: [sanitizedColumn],
+        body: sanitizedRows,
         startY: 40,
-        styles: { fontSize: 9, cellPadding: 3, font: "Roboto" },
-        headStyles: { fillColor: [108, 99, 255], textColor: [255, 255, 255], font: "Roboto" },
-        alternateRowStyles: { fillColor: [245, 245, 255] }
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+          font: "Roboto",
+          fontStyle: "normal"
+        },
+        headStyles: {
+          fillColor: [108, 99, 255],
+          textColor: [255, 255, 255],
+          font: "Roboto",
+          fontStyle: "normal"
+        },
+        alternateRowStyles: { fillColor: [245, 245, 255] },
+        didParseCell: (data) => {
+          // Force font on each cell to be absolutely sure metrics are applied
+          data.cell.styles.font = "Roboto";
+          data.cell.styles.fontStyle = "normal";
+        }
       };
 
+      // Use the modern autoTable function directly
       autoTable(doc, tableOptions);
 
       const fileName = `Onayli_Rezervasyonlar_${resourceName.replace(/\s+/g, '_')}_${new Date().toISOString().split('T')[0]}.pdf`;

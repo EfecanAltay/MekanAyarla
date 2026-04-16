@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { fetchApi } from '../lib/api';
 import { Check, ArrowRight, MapPin, Calendar, Clock, User } from 'lucide-react';
@@ -9,7 +9,6 @@ import { generateDays, generateSlots } from '../lib/slotutils';
 
 export default function PublicBookingPage() {
   const { resourceId } = useParams();
-  const navigate = useNavigate();
   const { t } = useTranslation();
   const [resourceDetails, setResourceDetails] = useState<any>(null);
   const [step, setStep] = useState(1);
