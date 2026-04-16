@@ -39,12 +39,12 @@ app.get('/health', (req, res) => {
 });
 
 // Routes 
-app.use('/api/auth', authRoutes);
-app.use('/api/resources', resourceRoutes);
-app.use('/api/reservations', reservationRoutes);
-app.use('/api/organizations', organizationRoutes);
-app.use('/api/resource-types', resourceTypeRoutes);
-app.use('/api/branches', branchRoutes);
+app.use('/auth', authRoutes);
+app.use('/resources', resourceRoutes);
+app.use('/reservations', reservationRoutes);
+app.use('/organizations', organizationRoutes);
+app.use('/resource-types', resourceTypeRoutes);
+app.use('/branches', branchRoutes);
 
 // Error handling
 app.use(errorHandler);
