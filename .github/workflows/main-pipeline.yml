@@ -57,7 +57,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   deploy-web:
-    needs: build-web
+    needs: [detect, build-web]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test'
     uses: ./.github/workflows/deploy-service.yml
     with:
@@ -83,7 +83,7 @@ jobs:
       DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
 
   deploy-server:
-    needs: build-server
+    needs: [detect, build-server]
     if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/test'
     uses: ./.github/workflows/deploy-service.yml
     with:
