@@ -9,16 +9,15 @@ on:
       SERVER_USER:
         type: string
         required: true
-      aws_region:
-        type: string
-        required: true
       service_name:
         type: string
         required: true
     secrets:
       THEFOODHEROAPI_SECRET:
         required: true
-      AWS_ACCOUNT_ID:
+      DOCKERHUB_USERNAME:
+        required: true
+      DOCKERHUB_TOKEN:
         required: true
 
 jobs:
@@ -40,33 +39,32 @@ jobs:
 
             cd /app/mekanayarla
 
-            REGION="${{ inputs.aws_region }}"
-            ACCOUNT_ID="${{ secrets.AWS_ACCOUNT_ID }}"
             SERVICE="${{ inputs.service_name }}"
             IMAGE_TAG="${{ github.sha }}"
+            DOCKER_USER="${{ secrets.DOCKERHUB_USERNAME }}"
 
-            export ECR_REGISTRY="\$ACCOUNT_ID.dkr.ecr.\$REGION.amazonaws.com"
-            export ECR_REPOSITORY="mekanayarla/\$SERVICE"
+            export DOCKER_REPOSITORY="\$DOCKER_USER/mekanayarla-\$SERVICE"
             export IMAGE_TAG
 
             echo "🚀 Deploying \$SERVICE"
-            echo "📦 Image: \$ECR_REGISTRY/\$ECR_REPOSITORY:\$IMAGE_TAG"
+            echo "📦 Image: \$DOCKER_REPOSITORY:\$IMAGE_TAG"
 
-            aws ecr get-login-password --region "\$REGION" | \
-            docker login --username AWS --password-stdin "\$ECR_REGISTRY"
+            echo "\${{ secrets.DOCKERHUB_TOKEN }}" | docker login --username "\$DOCKER_USER" --password-stdin
 
             echo "🌐 Ensuring network exists: mekanayarla_net"
             docker network inspect mekanayarla_net >/dev/null 2>&1 || docker network create mekanayarla_net
 
             echo "🧹 Pre-deploy cleanup for \$SERVICE..."
-            docker image rm -f "\$ECR_REGISTRY/\$ECR_REPOSITORY:\$IMAGE_TAG" || true
+            docker image rm -f "\$DOCKER_REPOSITORY:\$IMAGE_TAG" || true
 
-            docker compose pull "\$SERVICE"
-            docker compose up -d --force-recreate "\$SERVICE"
+            # Update docker-compose file image or use environment variables
+            # Assuming docker-compose.yml uses image: ${DOCKER_REPOSITORY}:${IMAGE_TAG}
+            DOCKER_REPOSITORY=\$DOCKER_REPOSITORY IMAGE_TAG=\$IMAGE_TAG docker compose pull "\$SERVICE"
+            DOCKER_REPOSITORY=\$DOCKER_REPOSITORY IMAGE_TAG=\$IMAGE_TAG docker compose up -d --force-recreate "\$SERVICE"
 
             echo "🧹 Keeping last 2 images for \$SERVICE..."
-            docker images "\$ECR_REGISTRY/\$ECR_REPOSITORY" \
+            docker images "\$DOCKER_REPOSITORY" \
               --format "{{.ID}} {{.CreatedAt}}" | \
               sort -r | tail -n +3 | awk '{print \$1}' | xargs -r docker rmi || true
 
-          EOF
+          EOF
